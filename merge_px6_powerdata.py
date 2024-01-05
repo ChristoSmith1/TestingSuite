@@ -46,11 +46,22 @@ def parse_px6_line(line: str) -> dict:
         return return_value
         pass
 
-with open(PX6_FILE_PATH, "r", encoding="utf8") as pointing_file:
-    pointing_file_lines = pointing_file.readlines()
+def read_px6_file(path: str) -> list[dict]:
+    return_value = []
+    with open(PX6_FILE_PATH, "r", encoding="utf8") as pointing_file:
+        pointing_file_lines = pointing_file.readlines()
 
-    #print(pointing_file_lines)
-    for line in pointing_file_lines:
-        # stripped_line = line.strip()
-        # print(stripped_line)
-        data = parse_px6_line(line)
+        #print(pointing_file_lines)
+        for line in pointing_file_lines:
+            # stripped_line = line.strip()
+            # print(stripped_line)
+            data = parse_px6_line(line)
+            if not data: 
+                continue
+            # print (data)
+            return_value.append(data)
+            # print (return_value)
+        return return_value
+    
+data = read_px6_file(PX6_FILE_PATH)
+print(data)
