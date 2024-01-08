@@ -12,13 +12,13 @@ start_time = time.time() #start time of operations of the actual machine, and re
 rm = pyvisa.ResourceManager() #This lookes at all of the GPIB available resources and gives their addresses in a particular format
 print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
 number_of_readings = 100 #This is the hard coded value for the first test we did on May 2, 2023
-pause_between_readings = 1.00 #This is the hard coded value for the first test we did on May 2, 2023
+pause_between_readings = 9.00 #This is the hard coded value for the first test we did on May 2, 2023
 
 ########### SPECTRUM ANALYZER ###############
 
 #1::18 is spectrum analyzer
 
-SpecAn = rm.open_resource("GPIB1::18::INSTR")
+#SpecAn = rm.open_resource("GPIB1::18::INSTR")
 
 """
 print(SpecAn.query('MKF?'))
@@ -45,23 +45,35 @@ with open("MSU_SpecAn_Testing_01_02_2024" + ".txt", "w") as file:
 ##############SIGNAL GENERATOR##################
 #sig gen started first because we want everything to follow what happens in the loop
 
-frq=22106000
-pwr=9
-
+start_frq=22106000
+end_frq=22206000
+frq=0
+frq_step=1000
+list =[":",9,8,7]#6,5,4,3,2,1,0)
+frq=start_frq
 SigGen = rm.open_resource("GPIB1::20::INSTR")
-for i in range(number_of_readings):
-    pwr=pwr+1
-    print(frq)
-    SigGen.write("P0"+str(frq)+"Z0K"+str(pwr)+"L0M0N6O1")
-    SpecAn = rm.open_resource("GPIB1::18::INSTR")
-    (SpecAn.write("CF 2210MHZ"))
-    (SpecAn.write("MKPK"))
-    MarkF=(SpecAn.query('MKF?'))
-    SpecPow=(SpecAn.query('MKA?'))
-    sleep(pause_between_readings)
-    print((str(datetime.utcnow()),meter,MarkF,SpecPow,frq))
+'''
+with open("MSU_S_Band_gain_linearity_test_23_01_08" + ".txt", "w") as file:
+    for i in range(((end_frq-start_frq)/frq_step)):
+        for j in power:
+            SigGen.write("P0"+str(frq)+"Z0K"+str(j)+"L0M0N6O1")
+            pwr=str(j)
+            sleep(pause_between_readings)
+            print((str(datetime.utcnow()),str(frq),str(pwr)))
+            file.write(f"{datetime.utcnow()},{frq.strip()},{str(pwr)}\n")
+        #frq=frq+frq_step
+print("testing is finshed")
 #print(SigGen.query("P084500000Z0K3L0M0N6O1"))
-
+'''
+powerlist=len(list)
+with open("MSU_S_Band_gain_linearity_test_23_01_08" + ".txt", "w") as file:
+    for j in range(powerlist):
+        print(j)
+        SigGen.write("P0"+str(frq)+"Z0K"+str(list[j])+"L0M0N6O1")
+        pwr=str(list[j])
+        sleep(pause_between_readings)
+        print((str(datetime.utcnow()),str(frq),str(pwr)))
+        file.write(f"{datetime.utcnow()},{str(frq).strip()},{str(pwr)}\n")
 ##########POWER METER####################
 
 #Power_Meter = rm.open_resource("GPIB1::13::INSTR")
