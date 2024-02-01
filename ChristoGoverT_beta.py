@@ -19,15 +19,17 @@ print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB ad
 print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
 
 ########TESTING AND CALIBRATION THAT CAN BE AUTOMATED ########
-#print(power_meter.write('CAL')) #this calibrates the insturment
-#sleep(20)
-#print(power_meter.write('ZE')) #this zeroe's the insturment
-#sleep(20)
-#power_meter.write('*TST?') # This makes the machine conduct a self test before beginning
-#sleep(20)
+print(power_meter.write('CAL')) #this calibrates the insturment
+sleep(20)
+print(power_meter.write('ZE')) #this zeroe's the insturment
+sleep(20)
+power_meter.write('*TST?') # This makes the machine conduct a self test before beginning
+sleep(20)
 #the sleep cycles in the machine cal process above are their because while they are running, if I attempt to read out power it will crash
 
-#print(power_meter.query('*OPC?')) #this is the SCIP protocol for telling me operations are completed, currently prints "+5" implying syntax error
+print(power_meter.query('*OPC?')) #this is the SCIP protocol for telling me operations are completed, currently prints "+5" implying syntax error
+sleep(5)
+input("Press Enter to continue...")
 
 ######## USER INPUTS #########
 #number_of_readings =  int(input("How many times do you want to read?")) #This is the number of readings we wish to take
@@ -45,10 +47,11 @@ pause_between_readings = 0.10 #This is the hard coded value for the first test w
 
 ############# CREATION OF CSV AND WRITING OF POWERS ###############
 #Take user input for file naming convention
-filenumber = input("Input file number (1,2,etc.): ")
+#filenumber = input("Input file number (1,2,etc.): ")
 
 #opens a titles a CSV, should be in format Power_Reading_DISHNAME_Date.csv
-with open("MSU_PowerMeter_GoverT_09202023_2300UTC_" + filenumber + ".txt", "w") as file:
+#with open("MSU_PowerMeter_GoverT_09202023_2300UTC_" + filenumber + ".txt", "w") as file:
+with open("MSU_PowerMeter_GoverT_01022024_YYYYUTC_" +"XXXX"+ ".txt", "w") as file:
      #these arrays are only generated below for the plotting of the data after completion of the testing
      array_p = []
      array_t = []
@@ -57,8 +60,8 @@ with open("MSU_PowerMeter_GoverT_09202023_2300UTC_" + filenumber + ".txt", "w") 
          array_p.append(power)
          file.write(f"{datetime.utcnow()},{str(power)}\n")
          array_t.append(datetime.utcnow())
-#         print(i, datetime.utcnow(), power, "dBm") #printed for user benefit, to see how many iterations are left
-#         sleep(pause_between_readings)
+         print(i, datetime.utcnow(), power, "dBm") #printed for user benefit, to see how many iterations are left
+         sleep(pause_between_readings)
 
 print(f"Average = {sum(array_p) / len(array_p):0.2f}")
 
