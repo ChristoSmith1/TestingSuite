@@ -10,12 +10,12 @@ import numpy as np
 
 start_time = time.time() #start time of operations of the actual machine, and reading of data
 rm = pyvisa.ResourceManager() #This lookes at all of the GPIB available resources and gives their addresses in a particular format
-print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
+#print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
 
 power_meter = rm.open_resource('GPIB2::13::INSTR') #connects to the insturment of our choosing, hardcoded in at the moment.
-print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB address, serial number and firmware version and works.
+#print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB address, serial number and firmware version and works.
 
-print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
+#print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
 
 ########TESTING AND CALIBRATION THAT CAN BE AUTOMATED ########
 #print(power_meter.write('CAL')) #this calibrates the insturment
@@ -54,7 +54,7 @@ print(f"Average = {sum(array_p) / len(array_p):0.2f}")
 
 end_time = time.time() #this is the time the actual data gathering portion ends
 elapsed_time = end_time - start_time #elapsed time helps us dial in how many readings we think will be useful and the time delays that match pointing the dish
-print('Execution time of', number_of_readings, 'readings took' , elapsed_time, 'seconds') #execution time helps dial in the iterations and sleep times based on how long we have.
+print('Execution time of', number_of_readings, 'readings took' , elapsed_time, 'seconds' , 'your last file number was', filenumber) #execution time helps dial in the iterations and sleep times based on how long we have.
 
 #RESOURCES
 #https://naic.edu/~phil/hardware/Misc/powerMeters/E4418-90029_prog_man.pdf
