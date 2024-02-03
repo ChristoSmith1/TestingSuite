@@ -1,9 +1,10 @@
 from datetime import datetime
 from datetime import timedelta
 from datetime import time
+import csv
 
-PX6_FILE_PATH = "mockpx6.txt"
-POWER_METER_CSV_PATH = "MSU_PowerMeter_GoverT_09202023_2300UTC_1.txt"
+PX6_FILE_PATH = "merge_test/mockpx6.txt"
+POWER_METER_CSV_PATH = "merge_test/RealPower.csv"
 
 def parse_time(year: int, days: int, time: str,) -> datetime:
     """convert time and date to datetime object"""
@@ -46,7 +47,27 @@ def parse_px6_line(line: str) -> dict:
         return return_value
         pass
 
+def read_power_file(path: str) -> list [dict]:
+    """read a power meter file
+    """
+    return_value = []
+    with open(POWER_METER_CSV_PATH) as csv_file:
+        csv_reader = csv.DictReader(csv_file,fieldnames=["timestamp","power"])
+        for row_dict in csv_reader:
+            timestamp_str = row_dict["timestamp"]
+            timestamp_dt = datetime.fromisoformat(timestamp_str)
+            power_float = float(row_dict["power"])
+            row_dict["power"] = power_float
+            row_dict["timestamp"] = timestamp_dt
+            return_value.append(row_dict)
+            # print(f"{timestamp_str=!r}   {type(timestamp_str)=}")
+            # print(f"{timestamp_dt=!r}   {type(timestamp_dt)=}")
+            # print()
+        return return_value
+        
 def read_px6_file(path: str) -> list[dict]:
+    """read a px6 file
+    """
     return_value = []
     with open(PX6_FILE_PATH, "r", encoding="utf8") as pointing_file:
         pointing_file_lines = pointing_file.readlines()
@@ -62,6 +83,10 @@ def read_px6_file(path: str) -> list[dict]:
             return_value.append(data)
             # print (return_value)
         return return_value
-    
+
+print(PX6_FILE_PATH)
 data = read_px6_file(PX6_FILE_PATH)
 print(data)
+print("reading power data")
+power_data = read_power_file(POWER_METER_CSV_PATH)
+print(power_data)

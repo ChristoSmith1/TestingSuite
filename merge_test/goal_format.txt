@@ -1,0 +1,2 @@
+"timestamp-iso","date","doy","time","azimuth-degrees","elevation-degrees","power-dbm"
+"2024-07-26T14:14:37.857130","2024-07-26","190","14:14:37.857130","100","10","-38.99"
