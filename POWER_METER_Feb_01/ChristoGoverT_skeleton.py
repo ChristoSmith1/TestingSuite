@@ -8,7 +8,7 @@ import numpy as np
 
 ####### STARTS THE CLOCK ON OPERATION AND CONFIRMS ADDRESS IN EVENT OF MULTIPLE MACHINES #########3
 
-start_time = time.time() #start time of operations of the actual machine, and reading of data
+start_time = time.monotonic() #start time of operations of the actual machine, and reading of data
 rm = pyvisa.ResourceManager() #This lookes at all of the GPIB available resources and gives their addresses in a particular format
 #print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
 
@@ -52,7 +52,7 @@ with open("MSU_PowerMeter_GoverT_09202023_2300UTC_" + filenumber + ".csv", "w") 
 
 print(f"Average = {sum(array_p) / len(array_p):0.2f}")
 
-end_time = time.time() #this is the time the actual data gathering portion ends
+end_time = time.monotonic() #this is the time the actual data gathering portion ends
 elapsed_time = end_time - start_time #elapsed time helps us dial in how many readings we think will be useful and the time delays that match pointing the dish
 print('Execution time of', number_of_readings, 'readings took' , elapsed_time, 'seconds' , 'your last file number was', filenumber) #execution time helps dial in the iterations and sleep times based on how long we have.
 
