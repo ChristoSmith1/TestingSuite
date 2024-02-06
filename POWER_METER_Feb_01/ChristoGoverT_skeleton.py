@@ -10,9 +10,10 @@ import numpy as np
 
 start_time = time.monotonic() #start time of operations of the actual machine, and reading of data
 rm = pyvisa.ResourceManager() #This lookes at all of the GPIB available resources and gives their addresses in a particular format
-#print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
 
-power_meter = rm.open_resource('GPIB2::13::INSTR') #connects to the insturment of our choosing, hardcoded in at the moment.
+print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
+
+power_meter = rm.open_resource('GPIB1::13::INSTR') #connects to the insturment of our choosing, hardcoded in at the moment.
 #print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB address, serial number and firmware version and works.
 
 #print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
@@ -29,7 +30,7 @@ power_meter = rm.open_resource('GPIB2::13::INSTR') #connects to the insturment o
 #sleep(5)
 #input("Press Enter to continue...")
 
-number_of_readings = 100 #This is the hard coded value for the first test we did on May 2, 2023
+number_of_readings = 1000000 #This is the hard coded value for the first test we did on May 2, 2023
 pause_between_readings = 0.10 #This is the hard coded value for the first test we did on May 2, 2023
 
 ############# CREATION OF CSV AND WRITING OF POWERS ###############
@@ -37,7 +38,7 @@ pause_between_readings = 0.10 #This is the hard coded value for the first test w
 filenumber = input("Input file number (1,2,etc.): ")
 
 #opens a titles a CSV, should be in format Power_Reading_DISHNAME_Date.csv
-with open("MSU_PowerMeter_GoverT_09202023_2300UTC_" + filenumber + ".csv", "w") as file:
+with open("MSU_PowerMeter_GoverT_02202024_1500UTC_" + filenumber + ".csv", "w") as file:
 #with open("MSU_PowerMeter_GoverT_01022024_YYYYUTC_" +"XXXX"+ ".txt", "w") as file:
      #these arrays are only generated below for the plotting of the data after completion of the testing
      array_p = []
