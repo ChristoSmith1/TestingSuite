@@ -1,1 +1,6 @@
 Outputs_Not_Tracked_in_Git/
+
+**/.venv/
+**/venv/
+**/.vscode/
+**/__pycache__/
