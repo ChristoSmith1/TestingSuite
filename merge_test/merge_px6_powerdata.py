@@ -5,7 +5,10 @@ import csv
 from typing import Any
 
 PX6_FILE_PATH = "merge_test/mockpx6.txt"
-POWER_METER_CSV_PATH = "merge_test/RealPower.csv"
+POWER_METER_CSV_PATH_1 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_1.csv"
+POWER_METER_CSV_PATH_2 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_2.csv"
+POWER_METER_CSV_PATH_3 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_3.csv"
+
 
 def parse_time(year: int, days: int, time: str,) -> datetime:
     """convert time and date to datetime object"""
@@ -46,13 +49,12 @@ def parse_px6_line(line: str) -> dict:
         }
         # print(f"EXCEPTION: {type(exc)} {exc}")
         return return_value
-        pass
-
+        
 def read_power_file(path: str) -> list [dict]:
     """read a power meter file
     """
     return_value = []
-    with open(POWER_METER_CSV_PATH) as csv_file:
+    with open(POWER_METER_CSV_PATH_1) as csv_file:
         csv_reader = csv.DictReader(csv_file,fieldnames=["timestamp","power"])
         for row_dict in csv_reader:
             timestamp_str = row_dict["timestamp"]
@@ -108,16 +110,25 @@ def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
         in data
     ]
 
-print(PX6_FILE_PATH)
-pointing_data = read_px6_file(PX6_FILE_PATH)
-power_data = read_power_file(POWER_METER_CSV_PATH)
-power_data_timestamps = get_column(power_data, "timestamp")
-power_data_power = get_column(power_data, "power")
-print(power_data_timestamps)
-pointingaz = get_column(pointing_data,"azimuth")
-pointingel = get_column(pointing_data,"elevation")
-pointtime = get_column(pointing_data,"timestamp")
+#print(PX6_FILE_PATH)
+#pointing_data_1 = read_px6_file(PX6_FILE_PATH)
+#print(power_data_timestamps)
+#pointingaz = get_column(pointing_data,"azimuth")
+#pointingel = get_column(pointing_data,"elevation")
+#pointtime = get_column(pointing_data,"timestamp")
+
+
+power_data_1 = read_power_file(POWER_METER_CSV_PATH_1)
+power_data_2 = read_power_file(POWER_METER_CSV_PATH_2)
+power_data_3 = read_power_file(POWER_METER_CSV_PATH_3)
+
+# You can combine lists of things like this:
+combined_power_data = power_data_3
+
+
+power_data_timestamps = get_column(combined_power_data, "timestamp")
+power_data_power = get_column(combined_power_data, "power")
 
 import matplotlib.pyplot as plt
-plt.plot(pointtime,pointingel)
+plt.plot(power_data_timestamps, power_data_power)
 plt.show()
