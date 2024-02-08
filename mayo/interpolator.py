@@ -57,9 +57,11 @@ class Interpolator:
         x_key: str,
         *,
         method: Literal["linear", "cubic", "pchip"] = "linear",
+        extrapolate: bool = False
     ) -> None:
         self.x_key = x_key
         self.data = data
+        self.extrapolate = extrapolate
         self.y_keys = {
             key
             for key
@@ -96,6 +98,7 @@ class Interpolator:
             self._interpolators[y_key] = LinearSpline(
                 x=self.xs,
                 y=ys,
+                extrapolate=self.extrapolate,
             )
 
     def _create_cubic_interpolators(self) -> None:
@@ -104,7 +107,7 @@ class Interpolator:
             self._interpolators[y_key] = CubicSpline(
                 x=self.xs,
                 y=ys,
-                extrapolate=False,
+                extrapolate=self.extrapolate,
             )
 
     def _create_pchip_interpolators(self) -> None:
@@ -113,7 +116,7 @@ class Interpolator:
             self._interpolators[y_key] = PchipInterpolator(
                 x=self.xs,
                 y=ys,
-                extrapolate=False,
+                extrapolate=self.extrapolate,
             )
 
 

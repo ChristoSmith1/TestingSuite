@@ -1,1 +1,3 @@
 # Don't worry about what this file is or why it's here. -Mayo
+
+print("YO")
