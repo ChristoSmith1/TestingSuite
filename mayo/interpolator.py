@@ -75,6 +75,10 @@ class Interpolator:
         
         self.method = method
         self.xs = [item[x_key] for item in data]
+        if isinstance(self.xs[0], datetime.datetime):
+            self.xs: list[datetime.datetime]
+            self.xs = [item[x_key] for item in data]
+            pass
 
         self._interpolators: dict[str, _FloatInterpolator] = {}
         if self.method == "linear":

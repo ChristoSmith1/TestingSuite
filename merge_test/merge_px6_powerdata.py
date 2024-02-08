@@ -70,7 +70,7 @@ def read_px6_file(path: str) -> list[dict]:
     """read a px6 file
     """
     return_value = []
-    with open(PX6_FILE_PATH, "r", encoding="utf8") as pointing_file:
+    with open(path, "r", encoding="utf8") as pointing_file:
         pointing_file_lines = pointing_file.readlines()
 
         #print(pointing_file_lines)
@@ -108,16 +108,17 @@ def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
         in data
     ]
 
-print(PX6_FILE_PATH)
-pointing_data = read_px6_file(PX6_FILE_PATH)
-power_data = read_power_file(POWER_METER_CSV_PATH)
-power_data_timestamps = get_column(power_data, "timestamp")
-power_data_power = get_column(power_data, "power")
-print(power_data_timestamps)
-pointingaz = get_column(pointing_data,"azimuth")
-pointingel = get_column(pointing_data,"elevation")
-pointtime = get_column(pointing_data,"timestamp")
+if __name__ == "__main__":
+    print(PX6_FILE_PATH)
+    pointing_data = read_px6_file(PX6_FILE_PATH)
+    power_data = read_power_file(POWER_METER_CSV_PATH)
+    power_data_timestamps = get_column(power_data, "timestamp")
+    power_data_power = get_column(power_data, "power")
+    print(power_data_timestamps)
+    pointingaz = get_column(pointing_data,"azimuth")
+    pointingel = get_column(pointing_data,"elevation")
+    pointtime = get_column(pointing_data,"timestamp")
 
-import matplotlib.pyplot as plt
-plt.plot(pointtime,pointingel)
-plt.show()
+    import matplotlib.pyplot as plt
+    plt.plot(pointtime,pointingel)
+    plt.show()
