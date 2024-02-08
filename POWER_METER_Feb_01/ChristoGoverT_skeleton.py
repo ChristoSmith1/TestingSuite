@@ -38,18 +38,23 @@ pause_between_readings = 0.10 #This is the hard coded value for the first test w
 filenumber = input("Input file number (1,2,etc.): ")
 
 #opens a titles a CSV, should be in format Power_Reading_DISHNAME_Date.csv
-with open("MSU_PowerMeter_GoverT_02202024_1500UTC_" + filenumber + ".csv", "w") as file:
-#with open("MSU_PowerMeter_GoverT_01022024_YYYYUTC_" +"XXXX"+ ".txt", "w") as file:
-     #these arrays are only generated below for the plotting of the data after completion of the testing
-     array_p = []
-     array_t = []
-     for i in range(number_of_readings):
-         power = round(float(power_meter.query('FETC:POW:AC?')),2)
-         array_p.append(power)
-         file.write(f"{datetime.utcnow()},{str(power)}\n")
-         array_t.append(datetime.utcnow())
-         print(i, datetime.utcnow(), power, "dBm") #printed for user benefit, to see how many iterations are left
-         sleep(pause_between_readings)
+
+# Create new file
+file_name = "MSU_PowerMeter_GoverT_02202024_1500UTC_" + filenumber + ".csv"
+with open(file_name, "w", encoding="utf8") as file:
+    file.write("")
+
+#these arrays are only generated below for the plotting of the data after completion of the testing
+array_p = []
+array_t = []
+for i in range(number_of_readings):
+    power = round(float(power_meter.query('FETC:POW:AC?')),2)
+    array_p.append(power)
+    with open(file_name, "a", encoding="utf8") as file:
+        file.write(f"{datetime.utcnow()},{str(power)}\n")
+    array_t.append(datetime.utcnow())
+    print(i, datetime.utcnow(), power, "dBm") #printed for user benefit, to see how many iterations are left
+    sleep(pause_between_readings)
 
 print(f"Average = {sum(array_p) / len(array_p):0.2f}")
 
