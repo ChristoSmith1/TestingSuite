@@ -2,6 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import time
 import csv
+from typing import Any
 
 PX6_FILE_PATH = "merge_test/mockpx6.txt"
 POWER_METER_CSV_PATH = "merge_test/RealPower.csv"
@@ -84,9 +85,41 @@ def read_px6_file(path: str) -> list[dict]:
             # print (return_value)
         return return_value
 
+
+def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
+    """Get the data for a given key from a list of dicts, where each
+    dict contains that key
+
+    ```
+    px6_data = read_px6_file(PX6_FILE_PATH)
+    azimuth_data_list = get_column(px6_data, "azimuth")
+    ```
+
+    Args:
+        data (list[dict[str, Any]]): _description_
+        key (str): _description_
+
+    Returns:
+        list[Any]: _description_
+    """
+    return [
+        item[key]
+        for item
+        in data
+    ]
+
 print(PX6_FILE_PATH)
 data = read_px6_file(PX6_FILE_PATH)
 print(data)
 print("reading power data")
 power_data = read_power_file(POWER_METER_CSV_PATH)
+print(f"\n\Power data:")
 print(power_data)
+
+power_data_timestamps = get_column(power_data, "timestamp")
+power_data_power = get_column(power_data, "power")
+print(power_data_timestamps)
+
+import matplotlib.pyplot as plt
+plt.plot(power_data_timestamps, power_data_power)
+plt.show()
