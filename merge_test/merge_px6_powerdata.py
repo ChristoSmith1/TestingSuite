@@ -109,17 +109,15 @@ def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
     ]
 
 print(PX6_FILE_PATH)
-data = read_px6_file(PX6_FILE_PATH)
-print(data)
-print("reading power data")
+pointing_data = read_px6_file(PX6_FILE_PATH)
 power_data = read_power_file(POWER_METER_CSV_PATH)
-print(f"\n\Power data:")
-print(power_data)
-
 power_data_timestamps = get_column(power_data, "timestamp")
 power_data_power = get_column(power_data, "power")
 print(power_data_timestamps)
+pointingaz = get_column(pointing_data,"azimuth")
+pointingel = get_column(pointing_data,"elevation")
+pointtime = get_column(pointing_data,"timestamp")
 
 import matplotlib.pyplot as plt
-plt.plot(power_data_timestamps, power_data_power)
+plt.plot(pointtime,pointingel)
 plt.show()
