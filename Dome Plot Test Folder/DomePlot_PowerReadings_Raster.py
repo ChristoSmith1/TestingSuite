@@ -24,13 +24,13 @@ for j in phi[0,:]:
         val = 0.7+np.cos(j)*np.sin(i+np.pi/4.)# put something useful here
         inp.append([j, i, val])
 inp = np.array(inp)
-print inp.shape
-print inp[49:60, :]
+print(inp.shape)
+print(inp[49:60, :])
 
 #reshape the input array to the shape of the x,y,z arrays. 
 c = inp[:,2].reshape((n_phi,n_theta)).T
-print z.shape
-print c.shape
+print(z.shape)
+print(c.shape)
 
 
 #Set colours and render

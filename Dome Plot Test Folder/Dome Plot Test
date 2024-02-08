@@ -1,0 +1,67 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Sample data
+azimuth = (227.313,227.473,237.632,237.791,227.95,228.108,238.266,238.424,228.581,228.738,238.895,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051)  # Array of azimuth angles (0-360)
+elevation = (4.25,4.112,3.972,3.833,3.693,3.553,3.413,3.272,3.131,2.989,2.848,2.705,5,5,10,10,15,15,20,20,25,25,30)  # Array of elevation angles (0-90)
+values = [1,2,2,3,3,4,4,4,4,4,4,4,5,5,3,3,3,3,2,2,1,1,1]  # Array of values for coloring (0-100)
+# values = np.random.randint(0, 10, 23)
+
+# Normalize values for colormap
+# values_norm = (values - min(values)) / (max(values) - min(values))
+# values_norm = values
+# write a function that uses the miniumum as the base and goes from base to the largest delta in power
+
+
+def minmap(values: list[float]) -> list[float]:
+    """Normalize a list
+    """
+    minimum=min(values)
+    scaled_values =[]
+    for i in values:
+        new_value = i - minimum
+        scaled_values.append(new_value)
+    return scaled_values
+
+minmapvalues=minmap(values)
+
+# Convert angles to radians for plotting
+azimuth_rad = np.radians(azimuth)
+elevation_rad = np.radians(elevation)
+
+# Create a 3D plot
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot points on the dome
+ax.scatter(np.cos(azimuth_rad) * np.sin(elevation_rad),
+           np.sin(azimuth_rad) * np.sin(elevation_rad),
+           np.cos(elevation_rad),
+           c=minmapvalues, cmap='GnBu')  # Colormap from green to red, eventually
+
+# Set labels and title
+ax.set_xlabel('Az angle')
+ax.set_ylabel('Az angle')
+ax.set_zlabel('Elevation angle')
+ax.set_title('Plot of Az. and El. Points Heat Mapped to Power Data in dBm')
+
+# Set limits and aspect ratio
+ax.set_xlim(-1, 1)
+ax.set_ylim(-1, 1)
+ax.set_zlim(-1, 1)
+ax.set_aspect('equal')
+
+# Remove axis ticks and grid
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_zticks([])
+ax.grid(False)
+
+# Colorbar
+sm = plt.cm.ScalarMappable(cmap='GnBu')
+sm.set_array([])
+fig.colorbar(sm, label='Power Meter Values (in dB)')
+
+# Show the plot
+plt.show()
