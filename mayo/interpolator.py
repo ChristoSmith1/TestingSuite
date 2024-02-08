@@ -66,7 +66,10 @@ class Interpolator:
             key
             for key
             in data[0]
-            if key != self.x_key
+            if (
+                key != self.x_key
+                and isinstance(data[0][key], (int, float))
+            )
         }
         # if len(self.y_keys) == 1:
         #     self.y_key = next(iter(self.y_keys))
