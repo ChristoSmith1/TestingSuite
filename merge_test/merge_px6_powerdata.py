@@ -4,6 +4,8 @@ from datetime import time
 import csv
 from typing import Any
 
+#"r", encoding="utf8") as csv_file:
+
 PX6_FILE_PATH = "merge_test\GTprocedure_3.txt"
 POWER_METER_CSV_PATH_1 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_1.csv"
 POWER_METER_CSV_PATH_2 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_2.csv"
