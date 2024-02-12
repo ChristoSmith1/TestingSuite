@@ -112,49 +112,51 @@ def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
         in data
     ]
 
-#print(PX6_FILE_PATH)
-pointing_data_1 = read_px6_file(PX6_FILE_PATH)
-#print(power_data_timestamps)
-pointingaz = get_column(pointing_data_1,"azimuth")
-pointingel = get_column(pointing_data_1,"elevation")
-pointtime = get_column(pointing_data_1,"timestamp")
+
+if __name__ == "__main__":
+    #print(PX6_FILE_PATH)
+    pointing_data_1 = read_px6_file(PX6_FILE_PATH)
+    #print(power_data_timestamps)
+    pointingaz = get_column(pointing_data_1,"azimuth")
+    pointingel = get_column(pointing_data_1,"elevation")
+    pointtime = get_column(pointing_data_1,"timestamp")
 
 
-power_data_1 = read_power_file(POWER_METER_CSV_PATH_1)
-power_data_2 = read_power_file(POWER_METER_CSV_PATH_2)
-power_data_3 = read_power_file(POWER_METER_CSV_PATH_3)
+    power_data_1 = read_power_file(POWER_METER_CSV_PATH_1)
+    power_data_2 = read_power_file(POWER_METER_CSV_PATH_2)
+    power_data_3 = read_power_file(POWER_METER_CSV_PATH_3)
 
-# You can combine lists of things like this:
-#combined_power_data = power_data_1 + power_data_2 + power_data_3
-combined_power_data = power_data_1 + power_data_2 + power_data_3
+    # You can combine lists of things like this:
+    #combined_power_data = power_data_1 + power_data_2 + power_data_3
+    combined_power_data = power_data_1 + power_data_2 + power_data_3
 
-power_data_timestamps = get_column(combined_power_data, "timestamp")
-power_data_power = get_column(combined_power_data, "power")
+    power_data_timestamps = get_column(combined_power_data, "timestamp")
+    power_data_power = get_column(combined_power_data, "power")
 
-import matplotlib.pyplot as plt
-fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2)
-fig.suptitle('Power vs. Time and Azimuth vs. Elevation')
+    import matplotlib.pyplot as plt
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2)
+    fig.suptitle('Power vs. Time and Azimuth vs. Elevation')
 
-ax1.plot(power_data_timestamps,power_data_power)
-ax1.set_title('power vs. time')
-ax1.set_ylabel('power in dB')
-ax1.set_xlabel('Day + Time in UTC')
+    ax1.plot(power_data_timestamps,power_data_power)
+    ax1.set_title('power vs. time')
+    ax1.set_ylabel('power in dB')
+    ax1.set_xlabel('Day + Time in UTC')
 
-ax2.plot(pointtime,pointingaz, 'tab:green')
-ax2.set_title('time vs. az')
-ax2.set_xlabel("time")
-ax2.set_ylabel("azimuth")
+    ax2.plot(pointtime,pointingaz, 'tab:green')
+    ax2.set_title('time vs. az')
+    ax2.set_xlabel("time")
+    ax2.set_ylabel("azimuth")
 
-ax3.plot(pointtime,pointingel)
-ax3.set_title('time vs. el')
-ax3.set_xlabel("time")
-ax3.set_ylabel("elevation")
+    ax3.plot(pointtime,pointingel)
+    ax3.set_title('time vs. el')
+    ax3.set_xlabel("time")
+    ax3.set_ylabel("elevation")
 
-ax4.plot(pointingaz,pointingaz, 'tab:red')
-ax4.set_title('az vs. el')
-ax4.set_xlabel("azimuth")
-ax4.set_ylabel("elevation")
+    ax4.plot(pointingaz,pointingaz, 'tab:red')
+    ax4.set_title('az vs. el')
+    ax4.set_xlabel("azimuth")
+    ax4.set_ylabel("elevation")
 
-fig.tight_layout()
+    fig.tight_layout()
 
-plt.show()
+    plt.show()
