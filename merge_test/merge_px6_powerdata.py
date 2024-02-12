@@ -126,7 +126,7 @@ power_data_3 = read_power_file(POWER_METER_CSV_PATH_3)
 
 # You can combine lists of things like this:
 #combined_power_data = power_data_1 + power_data_2 + power_data_3
-combined_power_data = power_data_3
+combined_power_data = power_data_1 + power_data_2 + power_data_3
 
 power_data_timestamps = get_column(combined_power_data, "timestamp")
 power_data_power = get_column(combined_power_data, "power")
