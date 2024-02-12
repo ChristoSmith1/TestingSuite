@@ -56,7 +56,7 @@ def read_power_file(path: str) -> list [dict]:
     """read a power meter file
     """
     return_value = []
-    with open(POWER_METER_CSV_PATH_3) as csv_file:
+    with open(path,"r",encoding='utf8') as csv_file:
         csv_reader = csv.DictReader(csv_file,fieldnames=["timestamp","power"])
         for row_dict in csv_reader:
             timestamp_str = row_dict["timestamp"]
@@ -74,7 +74,7 @@ def read_px6_file(path: str) -> list[dict]:
     """read a px6 file
     """
     return_value = []
-    with open(PX6_FILE_PATH, "r", encoding="utf8") as pointing_file:
+    with open(path, "r", encoding="utf8") as pointing_file:
         pointing_file_lines = pointing_file.readlines()
 
         #print(pointing_file_lines)
