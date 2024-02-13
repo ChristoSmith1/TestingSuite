@@ -19,7 +19,7 @@ def combine(
         row['timestamp_float'] = timestamp_float
 
     interpolator = Interpolator(position_data,"timestamp_float")
-    print(interpolator)
+    # print(interpolator)
     
     # creating a L.D.S. with time, power, az, el
     return_value=[]
@@ -29,7 +29,7 @@ def combine(
         power = power_data_row['power']
         azimuth = interpolator(timestamp_float,'azimuth')
         elevation = interpolator(timestamp_float,'elevation')
-        print(f"{timestamp_float=} {timestamp_dt=} {power=}  {azimuth=}  {elevation=}")
+        # print(f"{timestamp_float=} {timestamp_dt=} {power=}  {azimuth=}  {elevation=}")
         output_row_dict = {
             'timestamp_posix': timestamp_float,
             'timestamp': timestamp_dt,
@@ -50,10 +50,10 @@ if __name__ == "__main__":
     from merge_test.merge_px6_powerdata import read_power_file, read_px6_file
     position_data = read_px6_file('merge_test/GTprocedure_3.txt')
     power_data = read_power_file('merge_test/MSU_PowerMeter_GoverT_06022024_XXXXUTC_3.csv')
-    print('MAYO')
-    print(position_data)
-    print("now its time for power data!")
-    print(power_data)
-    print('finished')
+    # print('MAYO')
+    # print(position_data)
+    # print("now its time for power data!")
+    # print(power_data)
+    # print('finished')
     combined_data = combine(power_data,position_data)
-    write_csv(combined_data,'combinedtest01.csv')
+    write_csv(combined_data,'merge_test/combinedtest02.csv')
