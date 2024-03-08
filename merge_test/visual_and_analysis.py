@@ -9,19 +9,10 @@ HWCTRL_LOG_PATH = "hwctrl.log"
 
 
 power_data = read_power_file(POWER_DATA_PATH)
-position_data = read_px6_file(PX6_DATA_PATH)
+# position_data = read_px6_file(PX6_DATA_PATH)
 position_data = parse_hwctrl_log_file(HWCTRL_LOG_PATH)
 
 combined_data = combine(power_data, position_data)
 
 # DO ANALYSIS
 
-
-# my_dict = {
-#     "david": 37,
-#     "mayo": 40351,
-# }
-
-# # my_dict["david"]
-# my_dict["clarke"] = 12345
-# my_dict["david"] = my_dict["david"] + 1

@@ -1,0 +1,4 @@
+Center Frequencies[GHz]  :[2.900, 2.925, 2.950, 2.975, 3.000, 1.025, 3.050, 3.075, 3.100]
+Powers[dBm]            :[-30, -20, -10]
+Span[MHz]              :100
+Step Size[hz]          :10000

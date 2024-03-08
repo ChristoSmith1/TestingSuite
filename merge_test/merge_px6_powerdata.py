@@ -126,6 +126,8 @@ if __name__ == "__main__":
     power_data_2 = read_power_file(POWER_METER_CSV_PATH_2)
     power_data_3 = read_power_file(POWER_METER_CSV_PATH_3)
 
+    
+
     # You can combine lists of things like this:
     #combined_power_data = power_data_1 + power_data_2 + power_data_3
     combined_power_data = power_data_1 + power_data_2 + power_data_3
@@ -134,29 +136,31 @@ if __name__ == "__main__":
     power_data_power = get_column(combined_power_data, "power")
 
     import matplotlib.pyplot as plt
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2)
-    fig.suptitle('Power vs. Time and Azimuth vs. Elevation')
 
-    ax1.plot(power_data_timestamps,power_data_power)
-    ax1.set_title('power vs. time')
-    ax1.set_ylabel('power in dB')
-    ax1.set_xlabel('Day + Time in UTC')
+    plt.plot(power_data_timestamps,power_data_power)
+    # fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2,2)
+    # fig.suptitle('Power vs. Time and Azimuth vs. Elevation')
 
-    ax2.plot(pointtime,pointingaz, 'tab:green')
-    ax2.set_title('time vs. az')
-    ax2.set_xlabel("time")
-    ax2.set_ylabel("azimuth")
+    # ax1.plot(power_data_timestamps,power_data_power)
+    # ax1.set_title('power vs. time')
+    # ax1.set_ylabel('power in dB')
+    # ax1.set_xlabel('Day + Time in UTC')
 
-    ax3.plot(pointtime,pointingel)
-    ax3.set_title('time vs. el')
-    ax3.set_xlabel("time")
-    ax3.set_ylabel("elevation")
+    # ax2.plot(pointtime,pointingaz, 'tab:green')
+    # ax2.set_title('time vs. az')
+    # ax2.set_xlabel("time")
+    # ax2.set_ylabel("azimuth")
 
-    ax4.plot(pointingaz,pointingaz, 'tab:red')
-    ax4.set_title('az vs. el')
-    ax4.set_xlabel("azimuth")
-    ax4.set_ylabel("elevation")
+    # ax3.plot(pointtime,pointingel)
+    # ax3.set_title('time vs. el')
+    # ax3.set_xlabel("time")
+    # ax3.set_ylabel("elevation")
 
-    fig.tight_layout()
+    # ax4.plot(pointingaz,pointingaz, 'tab:red')
+    # ax4.set_title('az vs. el')
+    # ax4.set_xlabel("azimuth")
+    # ax4.set_ylabel("elevation")
 
+    # fig.tight_layout()
+    plt.tight_layout()
     plt.show()

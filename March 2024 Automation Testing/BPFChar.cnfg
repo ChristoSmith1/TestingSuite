@@ -1,0 +1,8 @@
+startFreq       [GHz]      :2
+endFreq         [GHz]      :2.6
+stepSize        [MHz]      :0.5
+span            [KHz]      :100
+Start Power     [dBm]      :-70
+End Power       [dBm]      :0
+# Side Peaks    [Even Int] :0
+video averaging [Int]      :10
