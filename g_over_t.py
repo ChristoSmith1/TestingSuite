@@ -1,6 +1,11 @@
 import csv
 from datetime import datetime, timedelta
-from typing import Any
+import functools
+from pathlib import Path
+import re
+from typing import Any, Literal, Protocol, Sequence
+import numpy as np
+from scipy.interpolate import CubicSpline, PchipInterpolator
 
 
 def helloworld(message: str):
@@ -105,6 +110,241 @@ def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
         for item
         in data
     ]
+
+# This class is only to make type hinting work better.
+# This entire thing can be deleted with no change in
+# functionality.
+class _FloatInterpolator(Protocol):
+    def __call__(self, x: float) -> float:
+        """Interpolate the given value of `x`"""
+        ...
+
+
+class LinearSpline(_FloatInterpolator):
+    """Class to mimic (some) behavior of `scipy.interpolate.CubicSpline` et al
+    for linear interpolation"""
+    def __init__(
+        self,
+        x: Sequence[float],
+        y: Sequence[float],
+        extrapolate: bool = False
+    ) -> None:
+        self.x = list(x)
+        self.y = list(y)
+        self.min_x = min(self.x)
+        self.max_x = max(self.x)
+        self.extrapolate = extrapolate
+
+    @functools.lru_cache(maxsize=None)
+    def __call__(self, x: float) -> float:
+        if (
+            (x < self.min_x or x > self.max_x)
+            and not self.extrapolate
+        ):
+            return float("nan")
+        return np.interp(
+            x,
+            self.x,
+            self.y,
+        )
+
+
+class Interpolator:
+    def __init__(
+        self,
+        data: list[dict[str, float]],
+        x_key: str,
+        *,
+        method: Literal["linear", "cubic", "pchip"] = "linear",
+        extrapolate: bool = False
+    ) -> None:
+        self.x_key = x_key
+        self.data = data
+        self.extrapolate = extrapolate
+        self.y_keys = {
+            key
+            for key
+            in data[0]
+            if (
+                key != self.x_key
+                and isinstance(data[0][key], (int, float))
+            )
+        }
+        # if len(self.y_keys) == 1:
+        #     self.y_key = next(iter(self.y_keys))
+        # else:
+        #     self.y_key = None
+        
+        self.method = method
+        self.xs = [item[x_key] for item in data]
+        if isinstance(self.xs[0], datetime.datetime):
+            self.xs: list[datetime.datetime]
+            self.xs = [item[x_key] for item in data]
+            pass
+
+        self._interpolators: dict[str, _FloatInterpolator] = {}
+        if self.method == "linear":
+            self._create_linear_interpolators()
+        elif self.method == "cubic":
+            self._create_cubic_interpolators()
+        elif self.method == "pchip":
+            self._create_pchip_interpolators()
+        else:
+            raise ValueError(f"Invalid interpolation type {self.method!r}.")
+    
+    def __call__(self, x: float, key: str) -> float:
+        return self._interpolators[key](x)
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} object, method={self.method!r}, x_key={self.x_key!r}, domain=[{min(self.xs):0.4f},{max(self.xs):0.4f}]>"
+
+    def _create_linear_interpolators(self) -> None:
+        for y_key in self.y_keys:
+            ys = [item[y_key] for item in self.data]
+            self._interpolators[y_key] = LinearSpline(
+                x=self.xs,
+                y=ys,
+                extrapolate=self.extrapolate,
+            )
+
+    def _create_cubic_interpolators(self) -> None:
+        for y_key in self.y_keys:
+            ys = [item[y_key] for item in self.data]
+            self._interpolators[y_key] = CubicSpline(
+                x=self.xs,
+                y=ys,
+                extrapolate=self.extrapolate,
+            )
+
+    def _create_pchip_interpolators(self) -> None:
+        for y_key in self.y_keys:
+            ys = [item[y_key] for item in self.data]
+            self._interpolators[y_key] = PchipInterpolator(
+                x=self.xs,
+                y=ys,
+                extrapolate=self.extrapolate,
+            )
+
+def combine(
+    power_data: list[dict[str, Any]],
+    position_data: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    # add timestamp_float key to all data
+    for row in power_data:
+        timestamp_dt: datetime.datetime = row['timestamp']
+        timestamp_float = timestamp_dt.timestamp()
+        row['timestamp_float'] = timestamp_float
+    for row in position_data:
+        timestamp_dt: datetime.datetime = row['timestamp']
+        timestamp_float = timestamp_dt.timestamp()
+        row['timestamp_float'] = timestamp_float
+
+    interpolator = Interpolator(position_data,"timestamp_float")
+    # print(interpolator)
+    
+    # creating a L.D.S. with time, power, az, el
+    return_value=[]
+    for power_data_row in power_data:
+        timestamp_float = power_data_row['timestamp_float']
+        timestamp_dt = power_data_row['timestamp']
+        power = power_data_row['power']
+        azimuth = interpolator(timestamp_float,'azimuth')
+        elevation = interpolator(timestamp_float,'elevation')
+        # print(f"{timestamp_float=} {timestamp_dt=} {power=}  {azimuth=}  {elevation=}")
+        output_row_dict = {
+            'timestamp_posix': timestamp_float,
+            'timestamp': timestamp_dt,
+            'power': power,
+            'azimuth': azimuth,
+            'elevation': elevation,
+
+        }
+        return_value.append(output_row_dict)
+    return return_value
+
+hwctrl_regex_pattern = re.compile(
+    r"^(?P<year>\d+)\s+"
+    + r"(?P<day>\d+)\s+"
+    + r"(?P<time>\d+:\d+:\d+),\s*"
+    + r"(?P<actual_azimuth>\d+\.?\d*),\s*"
+    + r"(?P<actual_elevation>\d+\.?\d*),"
+    + r"(?P<commanded_azimuth>\d+\.?\d*),\s*"
+    + r"(?P<commanded_elevation>\d+\.?\d*),"
+    + r".*$",
+    flags=re.MULTILINE
+)
+
+# print(f"Regex pattern string is:\n{regex_pattern.pattern!r}")
+# print(f"\nRegex pattern is:\n{regex_pattern}")
+
+def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime | float]]:
+    rv = []
+    for match in hwctrl_regex_pattern.finditer(text):
+        # print (match)
+        groupdict = match.groupdict()
+        
+        date_dt = datetime.datetime(
+            year=int(groupdict["year"]),
+            month=1,
+            day=1,
+        ) + datetime.timedelta(
+            days = int(groupdict["day"]) - 1
+        )
+        time = datetime.time.fromisoformat(groupdict["time"])
+        timestamp = datetime.datetime.combine(date_dt.date(), time, tzinfo=datetime.UTC)
+        rv.append({
+            "timestamp": timestamp,
+            "actual_azimuth": float(groupdict["actual_azimuth"]),
+            "actual_elevation": float(groupdict["actual_elevation"]),
+            "commanded_azimuth": float(groupdict["commanded_azimuth"]),
+            "commanded_elevation": float(groupdict["commanded_elevation"]),
+        })
+    return rv
+
+def parse_hwctrl_log_file(path: Path | str) -> list[dict[str, datetime | float]]:
+    path = Path(path).expanduser().resolve()
+    text = path.read_text(encoding="utf8")
+    return parse_hwctrl_log_text(text)
+
+def convert_timestamp_to_float(data: list[dict[str, datetime | float]]) -> None:
+    """Convert the entries' `"timestamp"` values from `datetime.datetime` objects to `float` objects"""
+    for item in data:
+        timestamp_dt: datetime.datetime = item["timestamp"]
+        timestamp_float: float = float(timestamp_dt.timestamp())
+        item["timestamp_float"] = timestamp_float
+        item["timestamp_dt"] = timestamp_dt
+        del item["timestamp"]
+
+def convert_timestamp(
+    timestamp: datetime,
+    coerce_naive_to_utc: bool = True,
+    sep: str = "T",
+) -> str:
+    if coerce_naive_to_utc and timestamp.tzinfo is None:
+        timestamp = timestamp.replace(tzinfo=datetime.UTC)
+    return timestamp.isoformat(sep=sep,timespec="microseconds")
+
+def write_csv(
+    data: list[dict[str, datetime | float]],
+    path: Path | str,
+    fieldnames: Sequence[str] | None = None,
+):
+    if fieldnames is None:
+        fieldnames = tuple(data[0])
+    path = Path(path).expanduser().resolve()
+    with open(path, "w", encoding="utf8", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, dialect="unix")
+        writer.writeheader()
+        for row in data:
+            # Have to manually convert datetime. Yuck
+            for key in row:
+                value = row[key]
+                if isinstance(value, datetime.datetime):
+                    # value = value.replace(tzinfo=datetime.UTC)
+                    # value_string = value.isoformat(sep="T")
+                    row[key] = convert_timestamp(value)
+            writer.writerow(row)
+
 
 
 if __name__ == "__main__":
