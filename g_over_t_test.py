@@ -5,6 +5,13 @@
 import g_over_t
 
 g_over_t.hello_world("david")
-powerdata = g_over_t.read_power_file(r"POWER_METER_Sept_20\MSU_PowerMeter_GoverT_09202023_2000UTC_0.txt")
+powerdata = g_over_t.read_power_file(r"merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_3.csv")
 print(powerdata)
 
+pointingdata = g_over_t.read_px6_file(r"merge_test\GTprocedure_3.txt")
+print(pointingdata)
+
+combineddata= g_over_t.combine_power_position(power_data=powerdata, position_data=pointingdata)
+print(combineddata)
+
+g_over_t.write_csv(combineddata, r"test_goverttest.csv")
