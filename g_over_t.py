@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta, time
 import functools
 from pathlib import Path
 import re
@@ -8,10 +8,10 @@ import numpy as np
 from scipy.interpolate import CubicSpline, PchipInterpolator
 
 
-def helloworld(message: str):
+def hello_world(message: str):
     print (f"Hello {message}")
 
-def parse_time(year: int, days: int, time: str,) -> datetime:
+def _parse_time(year: int, days: int, time: str,) -> datetime:
     """convert time and date to datetime object"""
     jan_1 = datetime(year,1,1)
     delta_after_jan1 = timedelta(days-1)
@@ -22,8 +22,8 @@ def parse_time(year: int, days: int, time: str,) -> datetime:
     return utc_time 
     pass
 
-def parse_px6_line(line: str) -> dict:
-    """parse a line"""
+def _parse_px6_line(line: str) -> dict:
+    """parse a line of position data from px6 file"""
     # print(line)
     try:
         stripped_line = line.strip()
@@ -36,7 +36,7 @@ def parse_px6_line(line: str) -> dict:
         azimuth = float(tokens[3])
         elevation = float(tokens[4])
         # print(f"{year = }  {doy = }   {time_in_utc = }   {azimuth = }   {elevation = }")
-        date_object = parse_time(year,doy,time_in_utc)
+        date_object = _parse_time(year,doy,time_in_utc)
         # print(date_object)
         return_value = {
             "timestamp": date_object,
@@ -51,8 +51,9 @@ def parse_px6_line(line: str) -> dict:
         # print(f"EXCEPTION: {type(exc)} {exc}")
         return return_value
         
-def read_power_file(path: str) -> list [dict]:
-    """read a power meter file
+def read_power_file(path: str) -> list [dict[str, datetime | float]]:
+    """read a power meter file. Expected datetime UTC and power in dB.
+    the function returns a list of dictionaries of strings
     """
     return_value = []
     with open(path,"r",encoding='utf8') as csv_file:
@@ -69,8 +70,8 @@ def read_power_file(path: str) -> list [dict]:
             # print()
         return return_value
         
-def read_px6_file(path: str) -> list[dict]:
-    """read a px6 file
+def read_px6_file(path: str) -> list[dict[str, datetime | float]]:
+    """read a px6 file 
     """
     return_value = []
     with open(path, "r", encoding="utf8") as pointing_file:
@@ -80,7 +81,7 @@ def read_px6_file(path: str) -> list[dict]:
         for line in pointing_file_lines:
             stripped_line = line.strip()
             # print(stripped_line)
-            data = parse_px6_line(line)
+            data = _parse_px6_line(line)
             if not data: 
                 continue
             # print (data)
@@ -97,13 +98,6 @@ def get_column(data: list[dict[str, Any]], key: str) -> list[Any]:
     px6_data = read_px6_file(PX6_FILE_PATH)
     azimuth_data_list = get_column(px6_data, "azimuth")
     ```
-
-    Args:
-        data (list[dict[str, Any]]): _description_
-        key (str): _description_
-
-    Returns:
-        list[Any]: _description_
     """
     return [
         item[key]
@@ -177,8 +171,8 @@ class Interpolator:
         
         self.method = method
         self.xs = [item[x_key] for item in data]
-        if isinstance(self.xs[0], datetime.datetime):
-            self.xs: list[datetime.datetime]
+        if isinstance(self.xs[0], datetime):
+            self.xs: list[datetime]
             self.xs = [item[x_key] for item in data]
             pass
 
@@ -225,17 +219,34 @@ class Interpolator:
                 extrapolate=self.extrapolate,
             )
 
-def combine(
+def combine_power_position(
     power_data: list[dict[str, Any]],
     position_data: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
+    """combine power and position with linearily interpolated values of az and el
+    limiting factor is timestamp from power data 
+
+    These are the keys: 
+            'timestamp_posix'
+            'timestamp'
+            'power'
+            'azimuth'
+            'elevation'
+
+    Args:
+        power_data (list[dict[str, Any]]): _description_
+        position_data (list[dict[str, Any]]): _description_
+
+    Returns:
+        list[dict[str, Any]]: _description_
+    """
     # add timestamp_float key to all data
     for row in power_data:
-        timestamp_dt: datetime.datetime = row['timestamp']
+        timestamp_dt: datetime = row['timestamp']
         timestamp_float = timestamp_dt.timestamp()
         row['timestamp_float'] = timestamp_float
     for row in position_data:
-        timestamp_dt: datetime.datetime = row['timestamp']
+        timestamp_dt: datetime = row['timestamp']
         timestamp_float = timestamp_dt.timestamp()
         row['timestamp_float'] = timestamp_float
 
@@ -262,7 +273,7 @@ def combine(
         return_value.append(output_row_dict)
     return return_value
 
-hwctrl_regex_pattern = re.compile(
+_hwctrl_regex_pattern = re.compile(
     r"^(?P<year>\d+)\s+"
     + r"(?P<day>\d+)\s+"
     + r"(?P<time>\d+:\d+:\d+),\s*"
@@ -278,20 +289,33 @@ hwctrl_regex_pattern = re.compile(
 # print(f"\nRegex pattern is:\n{regex_pattern}")
 
 def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime | float]]:
+    """extract hwctrl log data from raw text
+    These are the exact keys:
+            "timestamp"
+            "actual_azimuth"
+            "actual_elevation"
+            "commanded_azimuth"
+            "commanded_elevation"
+    Args:
+        text (str): _description_
+
+    Returns:
+        list[dict[str, datetime | float]]: _description_
+    """
     rv = []
-    for match in hwctrl_regex_pattern.finditer(text):
+    for match in _hwctrl_regex_pattern.finditer(text):
         # print (match)
         groupdict = match.groupdict()
         
-        date_dt = datetime.datetime(
+        date_dt = datetime(
             year=int(groupdict["year"]),
             month=1,
             day=1,
-        ) + datetime.timedelta(
+        ) + timedelta(
             days = int(groupdict["day"]) - 1
         )
-        time = datetime.time.fromisoformat(groupdict["time"])
-        timestamp = datetime.datetime.combine(date_dt.date(), time, tzinfo=datetime.UTC)
+        time_hwctrl = time.fromisoformat(groupdict["time"])
+        timestamp = datetime.combine(date_dt.date(), time_hwctrl, tzinfo=UTC)
         rv.append({
             "timestamp": timestamp,
             "actual_azimuth": float(groupdict["actual_azimuth"]),
@@ -302,26 +326,34 @@ def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime | float]]:
     return rv
 
 def parse_hwctrl_log_file(path: Path | str) -> list[dict[str, datetime | float]]:
+    """reads hwctrl log file
+
+    Args:
+        path (Path | str): _description_
+
+    Returns:
+        list[dict[str, datetime | float]]: _description_
+    """
     path = Path(path).expanduser().resolve()
     text = path.read_text(encoding="utf8")
     return parse_hwctrl_log_text(text)
 
-def convert_timestamp_to_float(data: list[dict[str, datetime | float]]) -> None:
+def _convert_timestamp_to_float(data: list[dict[str, datetime | float]]) -> None:
     """Convert the entries' `"timestamp"` values from `datetime.datetime` objects to `float` objects"""
     for item in data:
-        timestamp_dt: datetime.datetime = item["timestamp"]
+        timestamp_dt: datetime = item["timestamp"]
         timestamp_float: float = float(timestamp_dt.timestamp())
         item["timestamp_float"] = timestamp_float
         item["timestamp_dt"] = timestamp_dt
         del item["timestamp"]
 
-def convert_timestamp(
+def _convert_timestamp(
     timestamp: datetime,
     coerce_naive_to_utc: bool = True,
     sep: str = "T",
 ) -> str:
     if coerce_naive_to_utc and timestamp.tzinfo is None:
-        timestamp = timestamp.replace(tzinfo=datetime.UTC)
+        timestamp = timestamp.replace(tzinfo=UTC)
     return timestamp.isoformat(sep=sep,timespec="microseconds")
 
 def write_csv(
@@ -329,6 +361,12 @@ def write_csv(
     path: Path | str,
     fieldnames: Sequence[str] | None = None,
 ):
+    """Writes csv from the LDS of data passed to it to the given path, with header
+    Args:
+        data (list[dict[str, datetime  |  float]]): _description_
+        path (Path | str): _description_
+        fieldnames (Sequence[str] | None, optional): _description_. Defaults to None.
+    """
     if fieldnames is None:
         fieldnames = tuple(data[0])
     path = Path(path).expanduser().resolve()
@@ -339,10 +377,8 @@ def write_csv(
             # Have to manually convert datetime. Yuck
             for key in row:
                 value = row[key]
-                if isinstance(value, datetime.datetime):
-                    # value = value.replace(tzinfo=datetime.UTC)
-                    # value_string = value.isoformat(sep="T")
-                    row[key] = convert_timestamp(value)
+                if isinstance(value, datetime):
+                    row[key] = _convert_timestamp(value)
             writer.writerow(row)
 
 
