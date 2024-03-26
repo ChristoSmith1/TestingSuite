@@ -18,15 +18,19 @@ combineddata= g_over_t.combine_power_position(power_data=powerdata, position_dat
 
 g_over_t.write_csv(combineddata, r"test_goverttest.csv")
 
-L = g_over_t.get_column(combineddata, "power")
-print(L)
+power_data_list = g_over_t.get_column(combineddata, "power")
+#print(L)
 
-M = g_over_t.get_column(combineddata, "azimuth")
+azimuth_data_list = g_over_t.get_column(combineddata, "azimuth")
 #print(M)
 
-plt.plot(L,M)
-plt.show
-#why doesn't this actually show any sort of plot
+timestamp_data_list = g_over_t.get_column(combineddata, "timestamp")
+
+print (f"length = {len(azimuth_data_list)}")
+print(f"length = {len(timestamp_data_list)}")
+print(f"{len(timestamp_data_list)=}")
+print(f"{len(azimuth_data_list)=}")
+
 
 #need to adjust my code for actual analysis for elevation column.
     #delta in on moon off moon for "first power delta"
