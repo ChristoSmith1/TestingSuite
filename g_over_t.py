@@ -243,6 +243,28 @@ def combine_power_position(
     # add timestamp_float key to all data
     for row in power_data:
         timestamp_dt: datetime = row['timestamp']
+
+        # If timestamp is a naive datetime object, explicitly set it to be a
+        # UTC timestamp. Otherwise, there can be discrepencies when converting
+        # to float (POSIX timestamp), which messes everything up.
+        # 
+        # TODO: Change power meter data collection code to create TZ-aware
+        # datetime objects by changing
+        # 
+        #   timestamp = datetime.datetime.utcnow()
+        #
+        #     to
+        #
+        #   timestamp = datetime.datetime.now(tz=datetime.UTC)
+        # 
+        # TODO: change _parse_time() function in this file to
+        # create TZ-aware datetimes. This is what is called when a PX6
+        # file is parsed.
+        #
+        # parse_hwctrl_log_text() function already creates TZ-aware objects
+        if timestamp_dt.tzinfo is None:
+            timestamp_dt: datetime = timestamp_dt.replace(tzinfo=UTC)
+
         timestamp_float = timestamp_dt.timestamp()
         row['timestamp_float'] = timestamp_float
     for row in position_data:
@@ -250,7 +272,7 @@ def combine_power_position(
         timestamp_float = timestamp_dt.timestamp()
         row['timestamp_float'] = timestamp_float
 
-    interpolator = Interpolator(position_data,"timestamp_float")
+    interpolator = Interpolator(position_data,"timestamp_float", method="linear", extrapolate=False)
     # print(interpolator)
     
     # creating a L.D.S. with time, power, az, el
