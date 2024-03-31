@@ -1,20 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from merge_test.merge_px6_powerdata import read_power_file, read_px6_file
-from mayo.parse_hwctrl_log import parse_hwctrl_log_file
-from mayo.combine_position_power import combine
 
 
-POWER_DATA_PATH = "MSU_PowerMeter_GoverT_09202023_2300UTC_3.csv"
-# PX6_DATA_PATH = "whatever/px6.txt"
-HWCTRL_LOG_PATH = "mayo/on_off_moon_176_D037T18_32_00.log"
+# POWER_DATA_PATH = "MSU_PowerMeter_GoverT_09202023_2300UTC_3.csv"
+# # PX6_DATA_PATH = "whatever/px6.txt"
+# HWCTRL_LOG_PATH = "mayo/on_off_moon_176_D037T18_32_00.log"
 
-power_data = read_power_file(POWER_DATA_PATH)
-# position_data = read_px6_file(PX6_DATA_PATH)
-position_data = parse_hwctrl_log_file(HWCTRL_LOG_PATH)
+# power_data = read_power_file(POWER_DATA_PATH)
+# # position_data = read_px6_file(PX6_DATA_PATH)
+# position_data = parse_hwctrl_log_file(HWCTRL_LOG_PATH)
 
-combined_data = combine(power_data, position_data)
+# combined_data = combine(power_data, position_data)
 
 # Sample data
 azimuth = (227.313,227.473,237.632,237.791,227.95,228.108,238.266,238.424,228.581,228.738,238.895,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051,239.051)  # Array of azimuth angles (0-360)
@@ -38,7 +35,7 @@ def minmap(values: list[float]) -> list[float]:
         scaled_values.append(new_value)
     return scaled_values
 
-minmapvalues=minmap(power_data)
+minmapvalues=minmap(values)
 
 # Convert angles to radians for plotting
 azimuth_rad = np.radians(azimuth)
@@ -75,7 +72,7 @@ ax.grid(False)
 # Colorbar
 sm = plt.cm.ScalarMappable(cmap='GnBu')
 sm.set_array([])
-fig.colorbar(sm, label='Power Meter Values (in dB)')
+# fig.colorbar(sm, label='Power Meter Values (in dB)')
 
 # Show the plot
 plt.show()
