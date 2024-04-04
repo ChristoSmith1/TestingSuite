@@ -355,7 +355,13 @@ if __name__ == "__main__":
     #T(el) = T_op*10**(measured power at elevation - cold sky temperature from moon reading)
     #plotting T(el) we must first caluclate it for Az=200,Az=225
 
-    b = [-40.52]*len(elcol2)
+#T_op = (135-((10**(Y-factor/10))*10))/((10**(Y-factor/10))-1) <- correct math!
+#T_el = T_op*10**((measured_power_at_any_elevation - off_moon_measurement)/10) <- theoretical math
+#off_moon_measurement hardcoded in as -40.52 until I figure out how to identify it. <- future problem
+#then I need to plot Y=T_el, X=elevation <-next to last step
+#overlay a line over that plot to show the T_el average <-last step
+
+    b = [-40.52]*len(elcol2) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
     class MyList(list):
         def __init__(self, *args):
             super(MyList, self).__init__(args)
@@ -373,7 +379,7 @@ if __name__ == "__main__":
     def divide_by_10(original_list):
             divided_list = []
             for num in original_list:
-                divided_list.append(num / 10)
+                divided_list.append(num / 10) #<-This is where my errors begin April 3, 2024
             return divided_list
     aa = divide_by_10(z)
 
