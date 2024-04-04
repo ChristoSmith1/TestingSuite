@@ -10,16 +10,13 @@ print("--------")
 
 timemin=min(df["timestamp_posix"])
 df["elapsed_time"]=df["timestamp_posix"]-timemin
+df.to_csv("sample.csv",index=False)
+
+azimuthcol1_df=df.loc[(df['azimuth'] >= 199) & (df['azimuth'] <= 201)]
+#azimuthcol2_df=df.loc[(df['azimuth'] >= 224) & (df['azimuth'] <= 226)]
+azimuthcol2_df=df.loc[(df['azimuth'] >= 224) & (df['azimuth'] <= 226) & (df['elapsed_time'] >= 2974.8)]
 
 
-
-
-# elevation = df["elevation"]
-# timemin= min(df["timestamp_posix"])
-# print(f"timemin is {timemin}")
-# timestamp_posix=df["timestamp_posix"]
-# print(f"thetimestampposixisthis \n{timestamp_posix}")
-# elapsed_time=timestamp_posix-timemin
-# print(f"elapsed time is as follows \n {elapsed_time}")
-# df["elapsed_time"]=elapsed_time
-print(df)
+# plt.plot(azimuthcol1_df["elevation"],azimuthcol1_df["power"])
+plt.plot(azimuthcol2_df["elapsed_time"],azimuthcol2_df["elevation"])
+plt.show()
