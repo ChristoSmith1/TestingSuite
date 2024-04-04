@@ -300,9 +300,6 @@ if __name__ == "__main__":
         path = filtered_combined_data_file_path,
     )
 
-
-
-
     #  ╭───────────────────────────╮
     #  │                           │
     #  │     DO ANALYSIS HERE!     │
@@ -328,18 +325,73 @@ if __name__ == "__main__":
     power_data_list = g_over_t.get_column(filtered_combined_data, "power")
     elevation_data_list = g_over_t.get_column(filtered_combined_data, "elevation")
     azimuth_data_list = g_over_t.get_column(filtered_combined_data, "azimuth")
+    time_data_list = g_over_t.get_column(filtered_combined_data, "timestamp_posix")
 
-    #####Y-FACTOR DEFINITION####
-    Yfactor=(max(power_data_list)-min(power_data_list))
-    # # Yfactor=2.18
-    print(Yfactor)
-    Top=abs((135-(10**(Yfactor/10))*10)/(10**(Yfactor-10)-1))
-    print(f"Y-factor = {Yfactor}")
-    print(f"Tempetrature (Op), Top = {Top}")
+    # plt.plot (time_data_list,power_data_list)
+    # plt.show()
+##### ACTUAL VS COMMANDED POINTING #####
+    
+##### ATTEMPTING TO FIGURE OUT FILTERING OF ELEVATION COLUMNS #####
 
-    ######DOME PLOT FOR TRACK#####
-    # min = min(power_data_list)
-    # print (min)
+    filtered_points1 = [
+        point
+        for point
+        in filtered_combined_data
+        if point["azimuth"] >=(225)
+    ]
+    for point in filtered_points1:
+        elcol1 = g_over_t.get_column(filtered_points1,"elevation")
+        elcol2 = g_over_t.get_column(filtered_points1,"power")
+    #     plt.plot(elcol1,elcol2)
+    #     plt.show()
+    # as of April 3 this doesn't work
+
+    # #####Y-FACTOR DEFINITION####
+    # Yfactor=(max(power_data_list)-min(power_data_list))
+    # need Y-factor to be just from the on/off moon portion of the test
+    # having it use the generic minimum creates an inaccurate reading
+    Yfactor=2.18
+    # print(Yfactor)
+    T_op = (135-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
+    # print(f"Y-factor = {Yfactor}")
+    print(f"Tempetrature (Op), T_op = {T_op}")
+    #T(el) = T_op*10**(measured power at elevation - cold sky temperature from moon reading)
+    #plotting T(el) we must first caluclate it for Az=200,Az=225
+
+    b = [-40.52]*len(elcol2)
+    class MyList(list):
+        def __init__(self, *args):
+            super(MyList, self).__init__(args)
+
+        def __sub__(self, other):
+         return self.__class__(*[item for item in self if item not in other])
+        
+    x = MyList(elcol2)
+    y = MyList(b)
+    z = x-y
+    # print(z)
+    #z is every power at elevations in our chosen azimuths minus the cold sky at moon temperature
+    #I need to make a list=aa that is every element in z divided by 10, then make a list that is T_op^(aa)
+    
+    # TempPow
+    # plt.plot(elcol1,TempPow)
+    # plt.show()
+
+    # ######PLOTS FOR DATA VISUALIZATION#####
+
+
+    # ######DOME PLOT FOR TRACK#####
+    # # min = min(power_data_list)
+    # # print (min)
+    # def minmap(power_data_list) -> list[float]:
+    #     minimum=min(power_data_list)
+    #     scaled_values =[]
+    #     for i in power_data_list:
+    #         new_value = i - minimum
+    #     scaled_values.append(new_value)
+    #     return scaled_values
+
+    # minmapvalues=minmap(power_data_list)
 
     # azimuth_rad = np.radians(azimuth_data_list)
     # elevation_rad = np.radians(elevation_data_list)
@@ -351,14 +403,14 @@ if __name__ == "__main__":
     # # Plot points on the dome
     # ax.scatter(np.cos(azimuth_rad) * np.sin(elevation_rad),
     #         np.sin(azimuth_rad) * np.sin(elevation_rad),
-    #         np.cos(elevation_rad),
-    #         c=power_data_list, cmap='GnBu')  # Colormap from green to red, eventually
+    #         np.cos(elevation_rad),marker=".",
+    #         c=power_data_list, cmap='YlOrRd')  # Colormap from green to red, eventually
 
     # # Set labels and title
     # ax.set_xlabel('Az angle')
     # ax.set_ylabel('Az angle')
     # ax.set_zlabel('Elevation angle')
-    # ax.set_title('Plot of Az. and El. Points Heat Mapped to Power Data in dBm')
+    # ax.set_title(f"Az. and El. Points Heat Mapped to Power Data in dBm, Yfactor ={Yfactor}")
 
     # # Set limits and aspect ratio
     # ax.set_xlim(-1, 1)
@@ -370,13 +422,12 @@ if __name__ == "__main__":
     # ax.set_xticks([])
     # ax.set_yticks([])
     # ax.set_zticks([])
-    # ax.grid(False)
+    # ax.grid(True)
 
     # # Colorbar
-    # sm = plt.cm.ScalarMappable(cmap='GnBu')
+    # sm = plt.cm.ScalarMappable(cmap='YlOrRd')
     # sm.set_array([])
-    # # fig.colorbar(sm, label='Power Meter Values (in dB)')
-
+    # fig.colorbar(sm, label='Power Meter Values (in dB)', ax=ax)
     # # Show the plot
     # plt.show()
 
