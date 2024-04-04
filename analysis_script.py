@@ -13,6 +13,9 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import g_over_t
 
+from scipy.interpolate import BSpline
+from scipy.interpolate import make_interp_spline
+
 # INPUT DATA PATHS
 # Paths to data from 2024-03-26 test
 POWER_METER_DATA_PATH = "./MSU_PowerMeter_GoverT_03262024_0230UTC_1.csv"
@@ -340,8 +343,8 @@ if __name__ == "__main__":
         if point["azimuth"] >=(225)
     ]
     for point in filtered_points1:
-        elcol1 = g_over_t.get_column(filtered_points1,"elevation")
-        elcol2 = g_over_t.get_column(filtered_points1,"power")
+        elcolel = g_over_t.get_column(filtered_points1,"elevation")
+        elcolpower = g_over_t.get_column(filtered_points1,"power")
 
     # #####Y-FACTOR DEFINITION####
     # Yfactor=(max(power_data_list)-min(power_data_list))
@@ -361,41 +364,24 @@ if __name__ == "__main__":
 #then I need to plot Y=T_el, X=elevation <-next to last step
 #overlay a line over that plot to show the T_el average <-last step
 
-    b = [-40.52]*len(elcol2) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
-    class MyList(list):
-        def __init__(self, *args):
-            super(MyList, self).__init__(args)
-
-        def __sub__(self, other):
-         return self.__class__(*[item for item in self if item not in other])
-        
-    x = MyList(elcol2)
-    y = MyList(b)
-    z = x-y
-    # print(z)
-    #z is every power at elevations in our chosen azimuths minus the cold sky at moon temperature
-    #I need to make a list=aa that is every element in z divided by 10, then make a list that is T_op^(aa)
-            
-    def divide_by_10(original_list):
-            divided_list = []
-            for num in original_list:
-                divided_list.append(num / 10) #<-This is where my errors begin April 3, 2024
-            return divided_list
-    aa = divide_by_10(z)
-
-    def power_list(original_list):
-            powered_list = []
-            for num in original_list:
-                powered_list.append(10**num)
-            return powered_list
-    bb = power_list(aa)
-
-    TempPow = T_op*bb
-    plt.plot(elcol2,TempPow)
-    plt.show()
+    delta_cold_sky_off_moon = [-40.52]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
+    #print(delta_cold_sky_off_moon)
+    my_array = np. array(delta_cold_sky_off_moon)
+    #print(my_array)
+    my_array2 = np. array(elcolpower)
+    #print(my_array2-my_array)
+    my_array3 = (my_array2-my_array)/10
+    Tel = T_op*(10**my_array3)
 
     # ######PLOTS FOR DATA VISUALIZATION#####
-
+    ### tip curve ###
+    plt.plot(elcolel,Tel)
+    plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, Tel, 4))(np.unique(elcolel)))
+    plt.title('SNT vs. elevation at 225 degrees Azimuth')
+    plt.ylabel('SNT (in K)')
+    plt.xlabel('Elevation in Degrees')
+    plt.grid()
+    plt.show()
 
     # ######DOME PLOT FOR TRACK#####
     # # min = min(power_data_list)
