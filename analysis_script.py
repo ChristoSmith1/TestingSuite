@@ -247,14 +247,14 @@ if __name__ == "__main__":
         return data_copy
 
 
-    filtered_combined_data = filter_out_nan(combined_data)
+    valid_combined_data = filter_out_nan(combined_data)
 
     print(f"***** SUMMARY OF `filtered_combined_data` *****")
-    print_raw_data_info(filtered_combined_data)
+    print_raw_data_info(valid_combined_data)
     print()
 
     print(f"***** DETAILS OF `filtered_combined_data` *****")
-    print_raw_data_info(filtered_combined_data, detail=True)
+    print_raw_data_info(valid_combined_data, detail=True)
     print()
 
 
@@ -299,7 +299,7 @@ if __name__ == "__main__":
     filtered_combined_data_file_path = create_parent_folder(FILTERED_COMBINED_DATA_PATH)
     print(f"***** Writing `filtered_combined_data` to {filtered_combined_data_file_path} *****")
     g_over_t.write_csv(
-        data = filtered_combined_data,
+        data = valid_combined_data,
         path = filtered_combined_data_file_path,
     )
 
@@ -325,10 +325,10 @@ if __name__ == "__main__":
     # 
     # `filtered_combined_data` is the same thing, but it has 27,718 data points. Every data point that has
     # ANY value that is a NAN has been removed.
-    power_data_list = g_over_t.get_column(filtered_combined_data, "power")
-    elevation_data_list = g_over_t.get_column(filtered_combined_data, "elevation")
-    azimuth_data_list = g_over_t.get_column(filtered_combined_data, "azimuth")
-    time_data_list = g_over_t.get_column(filtered_combined_data, "timestamp_posix")
+    power_data_list = g_over_t.get_column(valid_combined_data, "power")
+    elevation_data_list = g_over_t.get_column(valid_combined_data, "elevation")
+    azimuth_data_list = g_over_t.get_column(valid_combined_data, "azimuth")
+    time_data_list = g_over_t.get_column(valid_combined_data, "timestamp_posix")
 
     # plt.plot (time_data_list,power_data_list)
     # plt.show()
@@ -336,15 +336,15 @@ if __name__ == "__main__":
     
 ##### ATTEMPTING TO FIGURE OUT FILTERING OF ELEVATION COLUMNS #####
 
-    filtered_points1 = [
+    elevation_column_1_points = [
         point
         for point
-        in filtered_combined_data
+        in valid_combined_data
         if point["azimuth"] >=(225)
     ]
-    for point in filtered_points1:
-        elcolel = g_over_t.get_column(filtered_points1,"elevation")
-        elcolpower = g_over_t.get_column(filtered_points1,"power")
+    for point in elevation_column_1_points:
+        elcolel = g_over_t.get_column(elevation_column_1_points,"elevation")
+        elcolpower = g_over_t.get_column(elevation_column_1_points,"power")
 
     # #####Y-FACTOR DEFINITION####
     # Yfactor=(max(power_data_list)-min(power_data_list))
