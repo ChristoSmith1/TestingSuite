@@ -342,9 +342,6 @@ if __name__ == "__main__":
     for point in filtered_points1:
         elcol1 = g_over_t.get_column(filtered_points1,"elevation")
         elcol2 = g_over_t.get_column(filtered_points1,"power")
-    #     plt.plot(elcol1,elcol2)
-    #     plt.show()
-    # as of April 3 this doesn't work
 
     # #####Y-FACTOR DEFINITION####
     # Yfactor=(max(power_data_list)-min(power_data_list))
@@ -372,10 +369,24 @@ if __name__ == "__main__":
     # print(z)
     #z is every power at elevations in our chosen azimuths minus the cold sky at moon temperature
     #I need to make a list=aa that is every element in z divided by 10, then make a list that is T_op^(aa)
-    
-    # TempPow
-    # plt.plot(elcol1,TempPow)
-    # plt.show()
+            
+    def divide_by_10(original_list):
+            divided_list = []
+            for num in original_list:
+                divided_list.append(num / 10)
+            return divided_list
+    aa = divide_by_10(z)
+
+    def power_list(original_list):
+            powered_list = []
+            for num in original_list:
+                powered_list.append(10**num)
+            return powered_list
+    bb = power_list(aa)
+
+    TempPow = T_op*bb
+    plt.plot(elcol2,TempPow)
+    plt.show()
 
     # ######PLOTS FOR DATA VISUALIZATION#####
 
