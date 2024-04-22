@@ -17,14 +17,14 @@ from scipy.interpolate import BSpline
 from scipy.interpolate import make_interp_spline
 
 # INPUT DATA PATHS
-# Paths to data from 2024-03-26 test
-POWER_METER_DATA_PATH = "./MSU_PowerMeter_GoverT_03262024_0230UTC_1.csv"
-PX6_DATA_PATH = "./GTpoint03252024.txt"
-HWCTRL_LOG_DATA_PATH = "./newEvent.176.D086T01-59-45"
+# Paths to data from 2024-04-21 test
+POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
+HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
 
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = "./2024-03-26_results/combined.csv"
-FILTERED_COMBINED_DATA_PATH = "./2024-03-26_results/combined_filtered.csv"
+COMBINED_DATA_PATH = R"april21govert\combined_01.csv"
+FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_01.csv"
 
 if __name__ == "__main__":
     print(f"START OF SCRIPT {__file__}")
@@ -290,14 +290,14 @@ if __name__ == "__main__":
 
 
     combined_data_file_path = create_parent_folder(COMBINED_DATA_PATH)
-    print(f"***** Writing `combined_data` to {combined_data_file_path} *****")
+    #print(f"***** Writing `combined_data` to {combined_data_file_path} *****")
     g_over_t.write_csv(
         data = combined_data,
         path = combined_data_file_path,
     )
 
     filtered_combined_data_file_path = create_parent_folder(FILTERED_COMBINED_DATA_PATH)
-    print(f"***** Writing `filtered_combined_data` to {filtered_combined_data_file_path} *****")
+    #print(f"***** Writing `filtered_combined_data` to {filtered_combined_data_file_path} *****")
     g_over_t.write_csv(
         data = valid_combined_data,
         path = filtered_combined_data_file_path,
@@ -331,108 +331,116 @@ if __name__ == "__main__":
     time_data_list = g_over_t.get_column(valid_combined_data, "timestamp_posix")
 
     # plt.plot (time_data_list,power_data_list)
+    # plt.plot (elevation_data_list, time_data_list)
     # plt.show()
+
+    fig, axs = plt.subplots(3)
+    fig.suptitle('Vertically stacked subplots')
+    axs[0].plot(time_data_list, power_data_list)
+    axs[1].plot(time_data_list, elevation_data_list)
+    axs[2].plot(time_data_list, azimuth_data_list)
+    plt.show()
 ##### ACTUAL VS COMMANDED POINTING #####
     
 ##### ATTEMPTING TO FIGURE OUT FILTERING OF ELEVATION COLUMNS #####
 
-    elevation_column_1_points = [
-        point
-        for point
-        in valid_combined_data
-        if point["azimuth"] >=(225)
-    ]
-    for point in elevation_column_1_points:
-        elcolel = g_over_t.get_column(elevation_column_1_points,"elevation")
-        elcolpower = g_over_t.get_column(elevation_column_1_points,"power")
+#     elevation_column_1_points = [
+#         point
+#         for point
+#         in valid_combined_data
+#         if point["azimuth"] >=(225)
+#     ]
+#     for point in elevation_column_1_points:
+#         elcolel = g_over_t.get_column(elevation_column_1_points,"elevation")
+#         elcolpower = g_over_t.get_column(elevation_column_1_points,"power")
 
-    # #####Y-FACTOR DEFINITION####
-    # Yfactor=(max(power_data_list)-min(power_data_list))
-    # need Y-factor to be just from the on/off moon portion of the test
-    # having it use the generic minimum creates an inaccurate reading
-    Yfactor=2.18
-    # print(Yfactor)
-    T_op = (135-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
-    # print(f"Y-factor = {Yfactor}")
+#     # #####Y-FACTOR DEFINITION####
+    Yfactor=(max(power_data_list)-min(power_data_list))
+#     # need Y-factor to be just from the on/off moon portion of the test
+#     # having it use the generic minimum creates an inaccurate reading
+#     Yfactor=2.18
+    print(Yfactor)
+    T_op = (180-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
+#     # print(f"Y-factor = {Yfactor}")
     print(f"Tempetrature (Op), T_op = {T_op}")
-    #T(el) = T_op*10**(measured power at elevation - cold sky temperature from moon reading)
-    #plotting T(el) we must first caluclate it for Az=200,Az=225
+#     #T(el) = T_op*10**(measured power at elevation - cold sky temperature from moon reading)
+#     #plotting T(el) we must first caluclate it for Az=200,Az=225
 
-#T_op = (135-((10**(Y-factor/10))*10))/((10**(Y-factor/10))-1) <- correct math!
-#T_el = T_op*10**((measured_power_at_any_elevation - off_moon_measurement)/10) <- theoretical math
-#off_moon_measurement hardcoded in as -40.52 until I figure out how to identify it. <- future problem
-#then I need to plot Y=T_el, X=elevation <-next to last step
-#overlay a line over that plot to show the T_el average <-last step
+# #T_op = (135-((10**(Y-factor/10))*10))/((10**(Y-factor/10))-1) <- correct math!
+# #T_el = T_op*10**((measured_power_at_any_elevation - off_moon_measurement)/10) <- theoretical math
+# #off_moon_measurement hardcoded in as -40.52 until I figure out how to identify it. <- future problem
+# #then I need to plot Y=T_el, X=elevation <-next to last step
+# #overlay a line over that plot to show the T_el average <-last step
 
-    delta_cold_sky_off_moon = [-40.52]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
-    #print(delta_cold_sky_off_moon)
-    my_array = np. array(delta_cold_sky_off_moon)
-    #print(my_array)
-    my_array2 = np. array(elcolpower)
-    #print(my_array2-my_array)
-    my_array3 = (my_array2-my_array)/10
-    Tel = T_op*(10**my_array3)
+#     delta_cold_sky_off_moon = [-40.52]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
+#     #print(delta_cold_sky_off_moon)
+#     my_array = np. array(delta_cold_sky_off_moon)
+#     #print(my_array)
+#     my_array2 = np. array(elcolpower)
+#     #print(my_array2-my_array)
+#     my_array3 = (my_array2-my_array)/10
+#     Tel = T_op*(10**my_array3)
 
-    # ######PLOTS FOR DATA VISUALIZATION#####
-    ### tip curve ###
-    plt.plot(elcolel,Tel)
-    plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, Tel, 4))(np.unique(elcolel)))
-    plt.title('SNT vs. elevation at 225 degrees Azimuth')
-    plt.ylabel('SNT (in K)')
-    plt.xlabel('Elevation in Degrees')
-    plt.grid()
-    plt.show()
+#     # ######PLOTS FOR DATA VISUALIZATION#####
+#     ### tip curve ###
+#     plt.plot(elcolel,Tel)
+#     plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, Tel, 4))(np.unique(elcolel)))
+#     plt.title('SNT vs. elevation at 225 degrees Azimuth')
+#     plt.ylabel('SNT (in K)')
+#     plt.xlabel('Elevation in Degrees')
+#     plt.grid()
+#     plt.show()
 
-    # ######DOME PLOT FOR TRACK#####
-    # # min = min(power_data_list)
-    # # print (min)
-    # def minmap(power_data_list) -> list[float]:
-    #     minimum=min(power_data_list)
-    #     scaled_values =[]
-    #     for i in power_data_list:
-    #         new_value = i - minimum
-    #     scaled_values.append(new_value)
-    #     return scaled_values
+#     # ######DOME PLOT FOR TRACK#####
+#     # # min = min(power_data_list)
+#     # # print (min)
+#     # def minmap(power_data_list) -> list[float]:
+#     #     minimum=min(power_data_list)
+#     #     scaled_values =[]
+#     #     for i in power_data_list:
+#     #         new_value = i - minimum
+#     #     scaled_values.append(new_value)
+#     #     return scaled_values
 
-    # minmapvalues=minmap(power_data_list)
+#     # minmapvalues=minmap(power_data_list)
 
-    # azimuth_rad = np.radians(azimuth_data_list)
-    # elevation_rad = np.radians(elevation_data_list)
+#     # azimuth_rad = np.radians(azimuth_data_list)
+#     # elevation_rad = np.radians(elevation_data_list)
 
-    # # Create a 3D plot
-    # fig = plt.figure(figsize=(8, 8))
-    # ax = fig.add_subplot(111, projection='3d')
+#     # # Create a 3D plot
+#     # fig = plt.figure(figsize=(8, 8))
+#     # ax = fig.add_subplot(111, projection='3d')
 
-    # # Plot points on the dome
-    # ax.scatter(np.cos(azimuth_rad) * np.sin(elevation_rad),
-    #         np.sin(azimuth_rad) * np.sin(elevation_rad),
-    #         np.cos(elevation_rad),marker=".",
-    #         c=power_data_list, cmap='YlOrRd')  # Colormap from green to red, eventually
+#     # # Plot points on the dome
+#     # ax.scatter(np.cos(azimuth_rad) * np.sin(elevation_rad),
+#     #         np.sin(azimuth_rad) * np.sin(elevation_rad),
+#     #         np.cos(elevation_rad),marker=".",
+#     #         c=power_data_list, cmap='YlOrRd')  # Colormap from green to red, eventually
 
-    # # Set labels and title
-    # ax.set_xlabel('Az angle')
-    # ax.set_ylabel('Az angle')
-    # ax.set_zlabel('Elevation angle')
-    # ax.set_title(f"Az. and El. Points Heat Mapped to Power Data in dBm, Yfactor ={Yfactor}")
+#     # # Set labels and title
+#     # ax.set_xlabel('Az angle')
+#     # ax.set_ylabel('Az angle')
+#     # ax.set_zlabel('Elevation angle')
+#     # ax.set_title(f"Az. and El. Points Heat Mapped to Power Data in dBm, Yfactor ={Yfactor}")
 
-    # # Set limits and aspect ratio
-    # ax.set_xlim(-1, 1)
-    # ax.set_ylim(-1, 1)
-    # ax.set_zlim(-1, 1)
-    # ax.set_aspect('equal')
+#     # # Set limits and aspect ratio
+#     # ax.set_xlim(-1, 1)
+#     # ax.set_ylim(-1, 1)
+#     # ax.set_zlim(-1, 1)
+#     # ax.set_aspect('equal')
 
-    # # Remove axis ticks and grid
-    # ax.set_xticks([])
-    # ax.set_yticks([])
-    # ax.set_zticks([])
-    # ax.grid(True)
+#     # # Remove axis ticks and grid
+#     # ax.set_xticks([])
+#     # ax.set_yticks([])
+#     # ax.set_zticks([])
+#     # ax.grid(True)
 
-    # # Colorbar
-    # sm = plt.cm.ScalarMappable(cmap='YlOrRd')
-    # sm.set_array([])
-    # fig.colorbar(sm, label='Power Meter Values (in dB)', ax=ax)
-    # # Show the plot
-    # plt.show()
+#     # # Colorbar
+#     # sm = plt.cm.ScalarMappable(cmap='YlOrRd')
+#     # sm.set_array([])
+#     # fig.colorbar(sm, label='Power Meter Values (in dB)', ax=ax)
+#     # # Show the plot
+#     # plt.show()
 
     # Wrapping up
     print(f"***** Analysis complete *****")
