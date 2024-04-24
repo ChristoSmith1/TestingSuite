@@ -334,35 +334,47 @@ if __name__ == "__main__":
     # plt.plot (elevation_data_list, time_data_list)
     # plt.show()
 
-    fig, axs = plt.subplots(3)
-    fig.suptitle('Vertically stacked subplots')
-    axs[0].plot(time_data_list, power_data_list)
-    axs[1].plot(time_data_list, elevation_data_list)
-    axs[2].plot(time_data_list, azimuth_data_list)
-    plt.show()
+    # fig, axs = plt.subplots(3)
+    # fig.suptitle('Vertically stacked subplots')
+    # axs[0].plot(time_data_list, power_data_list)
+    # axs[1].plot(time_data_list, elevation_data_list)
+    # axs[2].plot(time_data_list, azimuth_data_list)
+    # plt.show()
 ##### ACTUAL VS COMMANDED POINTING #####
     
 ##### ATTEMPTING TO FIGURE OUT FILTERING OF ELEVATION COLUMNS #####
 
-#     elevation_column_1_points = [
-#         point
-#         for point
-#         in valid_combined_data
-#         if point["azimuth"] >=(225)
-#     ]
-#     for point in elevation_column_1_points:
-#         elcolel = g_over_t.get_column(elevation_column_1_points,"elevation")
-#         elcolpower = g_over_t.get_column(elevation_column_1_points,"power")
+    elevation_column_1_points = [
+        point
+        for point
+        in valid_combined_data
+        if point["azimuth"] <=(120)
+    ]
+    elevation_column_2_points = [
+        point
+        for point
+        in elevation_column_1_points
+        if point["timestamp_posix"] >=(1713747477.119895)
+    ]
+    elevation_column_3_points = [
+        point
+        for point
+        in elevation_column_2_points
+        if point["timestamp_posix"] <=(1713749583.801868)
+    ]
+    for point in elevation_column_3_points:
+        elcolel = g_over_t.get_column(elevation_column_3_points,"elevation")
+        elcolpower = g_over_t.get_column(elevation_column_3_points,"power")
+    Yfactor=4.45
+    print(f"Y-factor ={Yfactor}")
+    T_op = (180-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
+    # T_el = (T_op*10**((elcolpower-60.22))/10)
+    print(f"Tempetrature (Op), T_op = {T_op}")
 
 #     # #####Y-FACTOR DEFINITION####
-    Yfactor=(max(power_data_list)-min(power_data_list))
+#    Yfactor=(max(power_data_list)-min(power_data_list))
 #     # need Y-factor to be just from the on/off moon portion of the test
 #     # having it use the generic minimum creates an inaccurate reading
-#     Yfactor=2.18
-    print(Yfactor)
-    T_op = (180-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
-#     # print(f"Y-factor = {Yfactor}")
-    print(f"Tempetrature (Op), T_op = {T_op}")
 #     #T(el) = T_op*10**(measured power at elevation - cold sky temperature from moon reading)
 #     #plotting T(el) we must first caluclate it for Az=200,Az=225
 
@@ -372,24 +384,24 @@ if __name__ == "__main__":
 # #then I need to plot Y=T_el, X=elevation <-next to last step
 # #overlay a line over that plot to show the T_el average <-last step
 
-#     delta_cold_sky_off_moon = [-40.52]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
-#     #print(delta_cold_sky_off_moon)
-#     my_array = np. array(delta_cold_sky_off_moon)
-#     #print(my_array)
-#     my_array2 = np. array(elcolpower)
-#     #print(my_array2-my_array)
-#     my_array3 = (my_array2-my_array)/10
-#     Tel = T_op*(10**my_array3)
+    delta_cold_sky_off_moon = [-60.22]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
+    #print(delta_cold_sky_off_moon)
+    my_array = np. array(delta_cold_sky_off_moon)
+    #print(my_array)
+    my_array2 = np. array(elcolpower)
+    #print(my_array2-my_array)
+    my_array3 = (my_array2-my_array)/10
+    Tel = T_op*(10**my_array3)
 
-#     # ######PLOTS FOR DATA VISUALIZATION#####
-#     ### tip curve ###
-#     plt.plot(elcolel,Tel)
-#     plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, Tel, 4))(np.unique(elcolel)))
-#     plt.title('SNT vs. elevation at 225 degrees Azimuth')
-#     plt.ylabel('SNT (in K)')
-#     plt.xlabel('Elevation in Degrees')
-#     plt.grid()
-#     plt.show()
+    # ######PLOTS FOR DATA VISUALIZATION#####
+    ### tip curve ###
+    plt.plot(elcolel,Tel)
+    plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, Tel, 4))(np.unique(elcolel)))
+    plt.grid(which='minor', color='#EEEEEE', linestyle=':', linewidth=0.5)
+    plt.title('SNT vs. elevation at 119 degrees Azimuth')
+    plt.ylabel('SNT (in K)')
+    plt.xlabel('Elevation in Degrees')
+    plt.show()
 
 #     # ######DOME PLOT FOR TRACK#####
 #     # # min = min(power_data_list)
