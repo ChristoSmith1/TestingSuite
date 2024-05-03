@@ -25,9 +25,11 @@ z2 = np.polyfit(azimuthcol2_df["elevation"], azimuthcol2_df["power"], 3)
 p2 = np.poly1d(z2)
 # Plot the dataset and the line of best fit
 
-plt.plot(azimuthcol1_df["elevation"],azimuthcol1_df["power"])
-plt.plot(azimuthcol1_df["elevation"], p(azimuthcol1_df["elevation"]), "-r")
-plt.plot(azimuthcol2_df["elevation"],azimuthcol2_df["power"])
-plt.plot(azimuthcol2_df["elevation"], p(azimuthcol2_df["elevation"]), "-g")
+# experimental uncertainty in measurement of power = +/-
+
+# plt.plot(azimuthcol1_df["elevation"],azimuthcol1_df["power"])
+# plt.plot(azimuthcol1_df["elevation"], p(azimuthcol1_df["elevation"]), "-r")
+# plt.plot(azimuthcol2_df["elevation"],azimuthcol2_df["power"])
+# plt.plot(azimuthcol2_df["elevation"], p(azimuthcol2_df["elevation"]), "-g")
 
 plt.show()
