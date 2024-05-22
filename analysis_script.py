@@ -18,13 +18,13 @@ from scipy.interpolate import make_interp_spline
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"MSU_PowerMeter_GoverT_03262024_0230UTC_1.csv"
-PX6_DATA_PATH = R"GTpoint03252024.txt"
-HWCTRL_LOG_DATA_PATH = R"newEvent.176.D086T01-59-45"
+POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
+HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
 
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"april21govert\combined_Sband_March.csv"
-FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_SBand_March.csv"
+COMBINED_DATA_PATH = R"april21govert\combined_Xband_April.csv"
+FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
 
 if __name__ == "__main__":
     print(f"START OF SCRIPT {__file__}")
@@ -326,17 +326,17 @@ if __name__ == "__main__":
     # `filtered_combined_data` is the same thing, but it has 27,718 data points. Every data point that has
     # ANY value that is a NAN has been removed.
 
-    # power_data_list = g_over_t.get_column(valid_combined_data, "power")
-    # elevation_data_list = g_over_t.get_column(valid_combined_data, "elevation")
-    # azimuth_data_list = g_over_t.get_column(valid_combined_data, "azimuth")
-    # time_data_list = g_over_t.get_column(valid_combined_data, "timestamp_posix")
+    power_data_list = g_over_t.get_column(valid_combined_data, "power")
+    elevation_data_list = g_over_t.get_column(valid_combined_data, "elevation")
+    azimuth_data_list = g_over_t.get_column(valid_combined_data, "azimuth")
+    time_data_list = g_over_t.get_column(valid_combined_data, "timestamp_posix")
 
-    # fig, axs = plt.subplots(3)
-    # fig.suptitle('power vs. time, elevation vs. time, azimuth versus time')
-    # axs[0].plot(time_data_list, power_data_list)
-    # axs[1].plot(time_data_list, elevation_data_list)
-    # axs[2].plot(time_data_list, azimuth_data_list)
-    # plt.show()
+    fig, axs = plt.subplots(3)
+    fig.suptitle('power vs. time, elevation vs. time, azimuth versus time')
+    axs[0].plot(time_data_list, power_data_list)
+    axs[1].plot(time_data_list, elevation_data_list)
+    axs[2].plot(time_data_list, azimuth_data_list)
+    plt.show()
 
 ##### ACTUAL VS COMMANDED POINTING #####
     
@@ -346,26 +346,26 @@ if __name__ == "__main__":
         point
         for point
         in valid_combined_data
-        if point["azimuth"] <=(226)
+        if point["azimuth"] <=(121)
     ]
     elevation_column_2_points = [
         point
         for point
         in elevation_column_1_points
-        if point["timestamp_posix"] >=(1711421428.07881)
+        if point["timestamp_posix"] >=(1713747486.12486)
     ]
     elevation_column_3_points = [
         point
         for point
         in elevation_column_2_points
-        if point["timestamp_posix"] <=(1711422477.96036)
+        if point["timestamp_posix"] <=(1713749730.563246)
     ]
     for point in elevation_column_3_points:
         elcolel = g_over_t.get_column(elevation_column_3_points,"elevation")
         elcolpower = g_over_t.get_column(elevation_column_3_points,"power")
-    Yfactor=2.2
+    Yfactor=4.38
     print(f"Y-factor ={Yfactor}")
-    T_op = (135-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
+    T_op = (150-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
     # T_op = (180)/((10**(Yfactor/10))-1)
     # T_el = (T_op*10**((elcolpower-60.22))/10)
     print(f"Tempetrature (Op), T_op = {T_op}")
@@ -383,15 +383,17 @@ if __name__ == "__main__":
 # #then I need to plot Y=T_el, X=elevation <-next to last step
 # #overlay a line over that plot to show the T_el average <-last step
 
-    delta_cold_sky_off_moon = [-40.52]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
+    delta_cold_sky_off_moon = [-60.22]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
     #print(delta_cold_sky_off_moon)
     my_array = np. array(delta_cold_sky_off_moon)
     #print(my_array)
     my_array2 = np. array(elcolpower)
     #print(my_array2-my_array)
     my_array3 = (my_array2-my_array)/10
-    my_array4 = [50]*len(elcolpower)
-    Tel = (T_op*(10**my_array3))-my_array4
+    # my_array4 = [50]*len(elcolpower)
+    # Tel = (T_op*(10**my_array3))-my_array4
+    # myarray 4 is for S-band data management.
+    Tel = (T_op*(10**my_array3))
 
     # ######PLOTS FOR DATA VISUALIZATION#####
     ### tip curve ###
