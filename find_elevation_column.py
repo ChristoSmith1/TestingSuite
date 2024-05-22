@@ -1,13 +1,18 @@
 import math
 from typing import Any, Generator
+import matplotlib as mpl
+from matplotlib.patches import Rectangle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.transforms
+
 
 file_path = R"april21govert/combined_filtered_01.csv"
 
 PI_OVER_2 = math.pi / 2
 
+LINE_OFFSET_MULTIPLIER = .01
 
 data = pd.read_csv(file_path)
 min_timestamp = min(data["timestamp_posix"])
@@ -116,7 +121,7 @@ def find_elevation_columns(data: pd.DataFrame):
         for index in range(start_index, end_index + 1):
             distance = distance_to_line(azimuths[index], elevations[index])
             # print(f"{distance = }")
-            if distance > .01 * line_length:
+            if distance > LINE_OFFSET_MULTIPLIER * line_length:
                 return None
 
         # return (start_index, end_index)
@@ -142,10 +147,11 @@ print(elevation_columns)
 
 # PLOTS
 
-fig, axes = plt.subplots(1,3, constrained_layout=True)
-ax0: plt.Axes = axes[0]
-ax1: plt.Axes = axes[1]
-ax2: plt.Axes = axes[2]
+fig, axes = plt.subplots(1,1, constrained_layout=True)
+ax2: plt.Axes = axes
+# ax0: plt.Axes = axes[0]
+# ax1: plt.Axes = axes[1]
+# ax2: plt.Axes = axes[2]
 
 tups = [
     # (ax0, "elapsed", "azimuth"),
@@ -158,10 +164,33 @@ for ax, x_key, y_key in tups:
     ax.plot(data[x_key], data[y_key])
     ax.set_xlabel(x_key)
     ax.set_ylabel(y_key)
-    ax.scatter([list(data[x_key])[0]], [list(data[y_key])[0]], color="green")
-    ax.scatter([list(data[x_key])[-1]], [list(data[y_key])[-1]], color="red")
+    ax.scatter([list(data[x_key])[0]], [list(data[y_key])[0]], color="#00ff00")
+    ax.scatter([list(data[x_key])[-1]], [list(data[y_key])[-1]], color="#008888")
 
-for elevation_column in elevation_columns:
+for column_start_series, column_end_series in elevation_columns:
+    start_el = column_start_series["elevation"]
+    end_el = column_end_series["elevation"]
+    start_az = column_start_series["azimuth"]
+    end_az = column_end_series["azimuth"]
+    line_length = math.dist((start_az, start_el), (end_az, end_el))
+    width = line_length * LINE_OFFSET_MULTIPLIER
+
+    midpoint_az = (start_az + end_az) / 2
+    midpoint_el = (start_el + end_el) / 2
+
+    rect = Rectangle(
+        xy=(midpoint_az - width / 2, midpoint_el - line_length / 2),
+        height=line_length,
+        width=width,
+        color="#ff000044",
+        # rotation_point="center",
+    )
+    rotation_angle = math.atan2((end_el-start_el), (end_az-start_az))
+    # transform = matplotlib.transforms.Affine2D().rotate_deg_around(midpoint_az, midpoint_el, 0.0) + ax2.transData
+    transform = matplotlib.transforms.Affine2D().rotate_around(midpoint_az, midpoint_el, rotation_angle + PI_OVER_2) + ax2.transData
+    rect.set_transform(transform)
+    ax2.add_patch(rect)
+    # ax2.plot([start_az, end_az], [start_el, end_el], color="#ff0000", linewidth=3)
     pass
 
 plt.show()
