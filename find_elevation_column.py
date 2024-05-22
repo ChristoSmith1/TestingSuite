@@ -86,12 +86,13 @@ def find_elevation_columns(data: pd.DataFrame):
                 yield from elevation_column_search(midpoint_index, end_index)
                 # print(f"SECOND RECURSIVE CALL END")
 
-    candidates = elevation_column_search(0, len(elevations) - 1)
-    
+    candidates = list(elevation_column_search(0, len(elevations) - 1))
+    print(candidates)
+    # exit(0)
     def validate(start_index: int, end_index: int):
-        # CRITERION: Must be at least 10 points
-        if end_index - start_index - 1 < 10:
-            return None
+        # # CRITERION: Must be at least 10 points
+        # if end_index - start_index - 1 < 10:
+        #     return None
         
         start_az = azimuths[start_index]
         end_az = azimuths[end_index]
@@ -101,12 +102,12 @@ def find_elevation_columns(data: pd.DataFrame):
         end_point = np.asarray((end_az, end_el))
 
         # CRITERION: highest elevation must be at least 60 deg
-        if max(start_el, end_el) < 60:
-            return None
+        # if max(start_el, end_el) < 60:
+        #     return None
         
         # CRITERION: lowest elevation must be at most 30 deg
-        if min(start_el, end_el) > 30:
-            return None
+        # if min(start_el, end_el) > 30:
+        #     return None
         
         # CRITERION: All (az, el) points must be within 1% of the line from START to END
         line_length = math.dist((start_az, start_el), (end_az, end_el))
@@ -121,8 +122,8 @@ def find_elevation_columns(data: pd.DataFrame):
         for index in range(start_index, end_index + 1):
             distance = distance_to_line(azimuths[index], elevations[index])
             # print(f"{distance = }")
-            if distance > LINE_OFFSET_MULTIPLIER * line_length:
-                return None
+            # if distance > LINE_OFFSET_MULTIPLIER * line_length:
+            #     return None
 
         # return (start_index, end_index)
         return (
@@ -159,7 +160,16 @@ tups = [
     (ax2, "azimuth", "elevation"),
 ]
 
-for ax, x_key, y_key in tups:
+colors = [
+    "ff0000",
+    "00ff00",
+    "0000ff",
+    # "ffff00",
+    # "ff00ff",
+    # "00ffff",
+]
+
+for index, (ax, x_key, y_key) in enumerate(tups):
     ax: plt.Axes
     ax.plot(data[x_key], data[y_key])
     ax.set_xlabel(x_key)
@@ -167,7 +177,9 @@ for ax, x_key, y_key in tups:
     ax.scatter([list(data[x_key])[0]], [list(data[y_key])[0]], color="#00ff00")
     ax.scatter([list(data[x_key])[-1]], [list(data[y_key])[-1]], color="#008888")
 
-for column_start_series, column_end_series in elevation_columns:
+for index, (column_start_series, column_end_series) in enumerate(elevation_columns):
+    color = colors[index % len(colors)]
+
     start_el = column_start_series["elevation"]
     end_el = column_end_series["elevation"]
     start_az = column_start_series["azimuth"]
@@ -182,7 +194,7 @@ for column_start_series, column_end_series in elevation_columns:
         xy=(midpoint_az - width / 2, midpoint_el - line_length / 2),
         height=line_length,
         width=width,
-        color="#ff000044",
+        color=f"#{color}22",
         # rotation_point="center",
     )
     rotation_angle = math.atan2((end_el-start_el), (end_az-start_az))
@@ -190,7 +202,7 @@ for column_start_series, column_end_series in elevation_columns:
     transform = matplotlib.transforms.Affine2D().rotate_around(midpoint_az, midpoint_el, rotation_angle + PI_OVER_2) + ax2.transData
     rect.set_transform(transform)
     ax2.add_patch(rect)
-    # ax2.plot([start_az, end_az], [start_el, end_el], color="#ff0000", linewidth=3)
+    # ax2.plot([start_az, end_az], [start_el, end_el], color=f"#{color}", linewidth=3)
     pass
 
 plt.show()
