@@ -18,13 +18,13 @@ from scipy.interpolate import make_interp_spline
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
-PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
-HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
+POWER_METER_DATA_PATH = R"april21govert/MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+PX6_DATA_PATH = R"april21govert/GTprocedure20240421.txt"
+HWCTRL_LOG_DATA_PATH = R"april21govert/GTAUTO.176.D113T00-27-51"
 
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"april21govert\combined_01.csv"
-FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_01.csv"
+COMBINED_DATA_PATH = R"april21govert/combined_01.csv"
+FILTERED_COMBINED_DATA_PATH = R"april21govert/combined_filtered_01.csv"
 
 if __name__ == "__main__":
     print(f"START OF SCRIPT {__file__}")

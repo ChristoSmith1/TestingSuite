@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 
-csv_path = R"2024-03-26_results\combined_filtered.csv"
+csv_path = R"2024-03-26_results/combined_filtered.csv"
 df=pd.read_csv(csv_path,parse_dates=["timestamp"])
 # print(df)
 # print("--------")
@@ -27,9 +27,9 @@ p2 = np.poly1d(z2)
 
 # experimental uncertainty in measurement of power = +/-
 
-# plt.plot(azimuthcol1_df["elevation"],azimuthcol1_df["power"])
-# plt.plot(azimuthcol1_df["elevation"], p(azimuthcol1_df["elevation"]), "-r")
-# plt.plot(azimuthcol2_df["elevation"],azimuthcol2_df["power"])
-# plt.plot(azimuthcol2_df["elevation"], p(azimuthcol2_df["elevation"]), "-g")
+plt.plot(azimuthcol1_df["elevation"],azimuthcol1_df["power"])
+plt.plot(azimuthcol1_df["elevation"], p(azimuthcol1_df["elevation"]), "-r")
+plt.plot(azimuthcol2_df["elevation"],azimuthcol2_df["power"])
+plt.plot(azimuthcol2_df["elevation"], p(azimuthcol2_df["elevation"]), "-g")
 
 plt.show()
