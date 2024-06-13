@@ -30,10 +30,10 @@ filtered_data["elapsed"] = filtered_data["timestamp_posix"] - timemin
 print(filtered_data)
 print(filtered_data.dtypes)
 
-fig,ax = plt.subplots()
-ax: plt.Axes
-ax.plot(filtered_data["timestamp_posix"],filtered_data["power"])
-plt.show()
+# fig,ax = plt.subplots()
+# ax: plt.Axes
+# ax.plot(filtered_data["timestamp_posix"],filtered_data["power"])
+# plt.show()
 
 def find_clusters(
     on_moon_power: pd.DataFrame,
@@ -85,7 +85,7 @@ def find_clusters(
 def y_factor_criteria(
     data: pd.DataFrame,
     threshold_value: float = 0.05,
-    off_moon_time_additon = 2
+    off_moon_time_addition: float = 15,
 ):
     max_power = max(data["power"])
 
@@ -93,11 +93,13 @@ def y_factor_criteria(
     
     on_moon_power: pd.DataFrame = data.loc[data["power"]>=power_threshold_min]
     clusters = find_clusters(on_moon_power)
+    on_moon_cluster_powers: list[pd.DataFrame] = []
+    off_moon_cluster_powers: list[pd.DataFrame] = []
     for cluster in clusters:
         on_moon_start_time = cluster[0]
         on_moon_stop_time = cluster[-1]
         timeframe = on_moon_stop_time - on_moon_start_time
-        off_moon_start_time = on_moon_stop_time + off_moon_time_additon
+        off_moon_start_time = on_moon_stop_time + off_moon_time_addition
         off_moon_stop_time = off_moon_start_time + timeframe
         on_moon_cluster_power = data.loc[data["elapsed"]>=on_moon_start_time]
         on_moon_cluster_power = on_moon_cluster_power.loc[on_moon_cluster_power["elapsed"]<=on_moon_stop_time]
@@ -107,18 +109,60 @@ def y_factor_criteria(
         off_moon_cluster_power = off_moon_cluster_power.loc[off_moon_cluster_power["elapsed"]<=off_moon_stop_time]
         average_off_moon_power = off_moon_cluster_power["power"].mean()
         print(f"the off moon average per cluster",average_off_moon_power)
+        on_moon_cluster_powers.append(on_moon_cluster_power)
+        off_moon_cluster_powers.append(off_moon_cluster_power)
+       
+    # print(on_moon_cluster_powers)
+    # print(off_moon_cluster_powers)
+    # on_moon_cluster_power_0 = on_moon_cluster_powers[0]
+    # average_on_moon_power_0 = on_moon_cluster_power_0["power"].mean()
+    # off_moon_cluster_power_0 = off_moon_cluster_powers[0]
+    # average_off_moon_power_0 = off_moon_cluster_power_0["power"].mean()
+    # print( f"{average_on_moon_power_0=}")
+    # print( f"{average_off_moon_power_0=}")
+    # comparison_0 = average_on_moon_power_0 - average_off_moon_power_0
+    # print( f"{comparison_0=}")
+    y_factors: list[float] = []
+    y_factors_len: list[float] = []
+    for index in range(len(on_moon_cluster_powers)):
+        y_factor = on_moon_cluster_powers[index]["power"].mean() - off_moon_cluster_powers[index]["power"].mean()
+        print( f"{index=} {y_factor=}")
+        y_factors.append(y_factor)
+        y_factors_len.append(index)
+    
 
-        pass
 
-    fig,[ax0, ax1] = plt.subplots(2)
-    ax0: plt.Axes
-    ax1: plt.Axes
-    ax0.scatter(on_moon_power["elapsed"],on_moon_power["power"])
-    ax0.plot(on_moon_power["elapsed"],on_moon_power["power"])
 
-    min_elapsed = min(data["elapsed"])
-    max_elapsed = max(data["elapsed"])
-    ax0.set_xlim(min_elapsed,max_elapsed)
+    fig,[ax_on_moon, ax_off_moon, ax_y_factor] = plt.subplots(3)
+    ax_on_moon: plt.Axes
+    ax_off_moon: plt.Axes
+    ax_y_factor: plt.Axes
+    #ax0.scatter(data["elapsed"],data["power"],color="#d9d1d0")
+    ax_on_moon.plot(data["elapsed"],data["power"],color="#d9d1d0")
+    
+    # ax1.scatter(data["elapsed"],data["power"],color="#d9d1d0")
+    ax_off_moon.plot(data["elapsed"],data["power"],color="#d9d1d0")
+    
+    ax_y_factor.scatter(y_factors_len,y_factors)
+    ax_y_factor.plot(y_factors_len,y_factors)
+    colors: list[str] = [
+        "#d42c19",
+        "#1529c2",
+    ]
+
+    for index in range (len(on_moon_cluster_powers)):
+        color_index = index % len(colors)
+        # ax_on_moon.scatter(on_moon_cluster_powers[index]["elapsed"],on_moon_cluster_powers[index]["power"],color=colors[color_index])
+        ax_on_moon.plot(on_moon_cluster_powers[index]["elapsed"],on_moon_cluster_powers[index]["power"],color=colors[color_index],linewidth=4)
+        # ax_off_moon.scatter(off_moon_cluster_powers[index]["elapsed"],off_moon_cluster_powers[index]["power"],color=colors[color_index])
+        ax_off_moon.plot(off_moon_cluster_powers[index]["elapsed"],off_moon_cluster_powers[index]["power"],color=colors[color_index],linewidth=4)
+
+
+    min_elapsed = min(on_moon_cluster_powers[0]["elapsed"]) - 50
+    max_elapsed = max(off_moon_cluster_powers[-1]["elapsed"]) + 50
+    ax_on_moon.set_xlim(min_elapsed,max_elapsed)
+    ax_off_moon.set_xlim(min_elapsed,max_elapsed)
+
 
 
     plt.show()
