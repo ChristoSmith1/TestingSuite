@@ -30,10 +30,10 @@ filtered_data["elapsed"] = filtered_data["timestamp_posix"] - timemin
 print(filtered_data)
 print(filtered_data.dtypes)
 
-# fig,ax = plt.subplots()
-# ax: plt.Axes
-# ax.plot(filtered_data["timestamp_posix"],filtered_data["power"])
-# plt.show()
+fig,ax = plt.subplots()
+ax: plt.Axes
+ax.plot(filtered_data["timestamp_posix"],filtered_data["power"])
+plt.show()
 
 def find_clusters(
     on_moon_power: pd.DataFrame,
