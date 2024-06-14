@@ -15,6 +15,7 @@ import g_over_t
 
 from scipy.interpolate import BSpline
 from scipy.interpolate import make_interp_spline
+from combined_filtered_analysis import y_factor_criteria
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
@@ -363,9 +364,15 @@ if __name__ == "__main__":
     for point in elevation_column_3_points:
         elcolel = g_over_t.get_column(elevation_column_3_points,"elevation")
         elcolpower = g_over_t.get_column(elevation_column_3_points,"power")
-    Yfactor=4.38
-    print(f"Y-factor ={Yfactor}")
-    T_op = (150-((10**(Yfactor/10))*10))/((10**(Yfactor/10))-1)
+        
+
+    combined_dataframe=g_over_t.convert_to_dataframe(valid_combined_data)
+    combined_dataframe=g_over_t.add_elapsed_time_column(combined_dataframe)
+    print(combined_dataframe)
+
+    y_factor=y_factor_criteria(combined_dataframe)
+    print(f"{y_factor=}")
+    T_op = (150-((10**(y_factor/10))*10))/((10**(y_factor/10))-1)
     # T_op = (180)/((10**(Yfactor/10))-1)
     # T_el = (T_op*10**((elcolpower-60.22))/10)
     print(f"Tempetrature (Op), T_op = {T_op}")

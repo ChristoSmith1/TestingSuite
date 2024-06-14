@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 from typing import Any, Literal, Protocol, Sequence
 import numpy as np
+import pandas as pd
 from scipy.interpolate import CubicSpline, PchipInterpolator
 
 
@@ -381,9 +382,26 @@ def write_csv(
                     row[key] = _convert_timestamp(value)
             writer.writerow(row)
 
+def convert_to_dataframe(data: list[dict[str, Any]])->pd.DataFrame:
+    first_row = data[0]
+    column_names=list(first_row.keys())
+    data_dict={}
+    for column_name in column_names:
+        column_data=get_column(data, column_name)
+        data_dict[column_name] = column_data
+    return_value=pd.DataFrame(data_dict)
+    return return_value
+
+def add_elapsed_time_column(data: pd.DataFrame) ->pd.DataFrame:
+    time_start = min(data["timestamp_posix"])
+    time_elapsed = data["timestamp_posix"] - time_start
+    data["elapsed"]=time_elapsed
+    return data
+
+
 
 
 if __name__ == "__main__":
-
-    print ("mayo")
-
+    pass
+    # print ("mayo")
+    # convert_to_dataframe()

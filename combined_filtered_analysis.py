@@ -112,16 +112,6 @@ def y_factor_criteria(
         on_moon_cluster_powers.append(on_moon_cluster_power)
         off_moon_cluster_powers.append(off_moon_cluster_power)
        
-    # print(on_moon_cluster_powers)
-    # print(off_moon_cluster_powers)
-    # on_moon_cluster_power_0 = on_moon_cluster_powers[0]
-    # average_on_moon_power_0 = on_moon_cluster_power_0["power"].mean()
-    # off_moon_cluster_power_0 = off_moon_cluster_powers[0]
-    # average_off_moon_power_0 = off_moon_cluster_power_0["power"].mean()
-    # print( f"{average_on_moon_power_0=}")
-    # print( f"{average_off_moon_power_0=}")
-    # comparison_0 = average_on_moon_power_0 - average_off_moon_power_0
-    # print( f"{comparison_0=}")
     y_factors: list[float] = []
     y_factors_len: list[float] = []
     for index in range(len(on_moon_cluster_powers)):
@@ -129,10 +119,9 @@ def y_factor_criteria(
         print( f"{index=} {y_factor=}")
         y_factors.append(y_factor)
         y_factors_len.append(index)
+    y_factor_final=np.array(y_factors).mean()
+    print(f"{y_factor_final=}")
     
-
-
-
     fig,[ax_on_moon, ax_off_moon, ax_y_factor] = plt.subplots(3)
     ax_on_moon: plt.Axes
     ax_off_moon: plt.Axes
@@ -167,4 +156,9 @@ def y_factor_criteria(
 
     plt.show()
 
-y_factor_criteria(data=filtered_data, threshold_value=.03)
+    return y_factor_final  
+
+
+if __name__ == "__main__":
+
+    y_factor_criteria(data=filtered_data, threshold_value=.03)
