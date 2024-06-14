@@ -17,15 +17,26 @@ from scipy.interpolate import BSpline
 from scipy.interpolate import make_interp_spline
 from combined_filtered_analysis import y_factor_criteria
 
+# # INPUT DATA PATHS
+# # Paths to data from 2024-04-21 test
+# POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+# PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
+# HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
+
+# # OUTPUT DATA PATHS
+# COMBINED_DATA_PATH = R"april21govert\combined_Xband_April.csv"
+# FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
+
+
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
-PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
-HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
+POWER_METER_DATA_PATH = R"MSU_PowerMeter_GoverT_03262024_0230UTC_1.csv"
+PX6_DATA_PATH = R"GTpoint03252024.txt"
+HWCTRL_LOG_DATA_PATH = R"newEvent_176_D086T01_59_45.txt"
 
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"april21govert\combined_Xband_April.csv"
-FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
+COMBINED_DATA_PATH = R"april21govert\combined_Sband_April.csv"
+FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_SBand_March.csv"
 
 if __name__ == "__main__":
     print(f"START OF SCRIPT {__file__}")
@@ -347,19 +358,19 @@ if __name__ == "__main__":
         point
         for point
         in valid_combined_data
-        if point["azimuth"] <=(121)
+        if point["azimuth"] <=(226)
     ]
     elevation_column_2_points = [
         point
         for point
         in elevation_column_1_points
-        if point["timestamp_posix"] >=(1713747486.12486)
+        if point["timestamp_posix"] >=(1711421414.8778)
     ]
     elevation_column_3_points = [
         point
         for point
         in elevation_column_2_points
-        if point["timestamp_posix"] <=(1713749730.563246)
+        if point["timestamp_posix"] <=(1711422454.897903)
     ]
     for point in elevation_column_3_points:
         elcolel = g_over_t.get_column(elevation_column_3_points,"elevation")
@@ -370,7 +381,7 @@ if __name__ == "__main__":
     combined_dataframe=g_over_t.add_elapsed_time_column(combined_dataframe)
     print(combined_dataframe)
 
-    y_factor=y_factor_criteria(combined_dataframe)
+    y_factor=y_factor_criteria(combined_dataframe, threshold_value=.2)
     print(f"{y_factor=}")
     T_op = (150-((10**(y_factor/10))*10))/((10**(y_factor/10))-1)
     # T_op = (180)/((10**(Yfactor/10))-1)

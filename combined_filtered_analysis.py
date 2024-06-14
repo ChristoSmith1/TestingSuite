@@ -20,20 +20,21 @@ from scipy.interpolate import make_interp_spline
 
 import pandas as pd
 
-FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
+if __name__ == "__main__":
+    FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
 
-filtered_data = pd.read_csv(FILTERED_COMBINED_DATA_PATH)
+    filtered_data = pd.read_csv(FILTERED_COMBINED_DATA_PATH)
 
-timemin = min(filtered_data["timestamp_posix"])
-filtered_data["elapsed"] = filtered_data["timestamp_posix"] - timemin
+    timemin = min(filtered_data["timestamp_posix"])
+    filtered_data["elapsed"] = filtered_data["timestamp_posix"] - timemin
 
-print(filtered_data)
-print(filtered_data.dtypes)
+    print(filtered_data)
+    print(filtered_data.dtypes)
 
-fig,ax = plt.subplots()
-ax: plt.Axes
-ax.plot(filtered_data["timestamp_posix"],filtered_data["power"])
-plt.show()
+    fig,ax = plt.subplots()
+    ax: plt.Axes
+    ax.plot(filtered_data["timestamp_posix"],filtered_data["power"])
+    plt.show()
 
 def find_clusters(
     on_moon_power: pd.DataFrame,
