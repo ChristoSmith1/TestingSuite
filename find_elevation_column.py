@@ -1,5 +1,5 @@
 import math
-from typing import Any, Generator
+from typing import Any, Generator, Generic, TypeVar
 import matplotlib as mpl
 from matplotlib.patches import Rectangle
 import numpy as np
@@ -8,13 +8,15 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms
 
 
-file_path = R"april21govert/combined_filtered_01.csv"
+# FILE_PATH = R"april21govert/combined_filtered_01.csv"
+FILE_PATH = R"2024-03-26_results/combined_filtered.csv"
+ALPHA = "88"
+LINE_OFFSET_MULTIPLIER = .01
+ANGLE_TOLERANCE_DEG = 10.0
 
 PI_OVER_2 = math.pi / 2
 
-LINE_OFFSET_MULTIPLIER = .01
-
-data = pd.read_csv(file_path)
+data = pd.read_csv(FILE_PATH)
 min_timestamp = min(data["timestamp_posix"])
 data["elapsed"] = data["timestamp_posix"] - min_timestamp
 
@@ -25,7 +27,7 @@ print(data)
 def angle_close_to(
     angle_radians: float,
     target_radians: float,
-    angle_delta_radians: float = math.radians(1.0),
+    angle_delta_radians: float,
     reverse_ok: bool = True
 ) -> bool:
     angle_radians = angle_radians % (2*math.pi)
@@ -44,6 +46,51 @@ def angle_close_to(
     else:
         return False
 
+
+T = TypeVar("T")
+
+class ClosedNumericInterval(Generic[T]):
+    def __init__(self, minimum: T, maximum: T) -> None:
+        self.minimum = minimum
+        self.maximum = maximum
+        pass
+
+    def __contains__(self, value: int) -> bool:
+        return self.minimum <= value and value <= self.maximum
+    
+    def union(self, other: "ClosedNumericInterval") -> "ClosedNumericInterval":
+        if not self.overlaps(other):
+            raise ValueError(f"")
+        return ClosedNumericInterval(
+            minimum=min(self.minimum, other.minimum),
+            maximum=max(self.maximum, other.maximum),
+
+        
+
+def find_a_column(
+    data: pd.DataFrame,
+    start_index: int,
+    end_index: int
+) -> tuple[int, int] | None:
+    """Find the indexes of a column with both endpoints in [start_index, end_index]
+
+    If no column exists, return None
+    
+    Column is NOT guaranteed to be longest possible or, leftmost possible,
+    or rightmost possible, or only column in the domain.
+
+    Only 
+    """
+    ...
+
+def extend_a_column_left(data: pd.DataFrame, start_index: int, end_index: int, limit_index: int):
+    """Extend the column [start_index, end_index] as much as possible, but only as fas as limit_inclusive (inclusive)"""
+    ...
+
+def extend_a_column_right(data: pd.DataFrame, start_index: int, end_index: int, limit_index: int):
+    ...
+
+
 def find_elevation_columns(data: pd.DataFrame):
     data = data.reset_index()
     azimuths = np.array(data["azimuth"])
@@ -53,7 +100,7 @@ def find_elevation_columns(data: pd.DataFrame):
         start_index: int,
         end_index: int,
         *,
-        angle_delta_radians: float = math.radians(1.0)
+        angle_delta_radians: float = math.radians(ANGLE_TOLERANCE_DEG)
     ) -> Generator[tuple[int, int], None, None]: # -> Generator[Any, None, None]:
         # print(f"{start_index}, {end_index}")
         if start_index >= end_index - 1 :
@@ -169,13 +216,13 @@ colors = [
     # "00ffff",
 ]
 
-for index, (ax, x_key, y_key) in enumerate(tups):
-    ax: plt.Axes
-    ax.plot(data[x_key], data[y_key])
-    ax.set_xlabel(x_key)
-    ax.set_ylabel(y_key)
-    ax.scatter([list(data[x_key])[0]], [list(data[y_key])[0]], color="#00ff00")
-    ax.scatter([list(data[x_key])[-1]], [list(data[y_key])[-1]], color="#008888")
+for index, (ax0, x_key, y_key) in enumerate(tups):
+    ax0: plt.Axes
+    ax0.plot(data[x_key], data[y_key], color="#bbbbbb88")
+    ax0.set_xlabel(x_key)
+    ax0.set_ylabel(y_key)
+    ax0.scatter([list(data[x_key])[0]], [list(data[y_key])[0]], color="#00ff00")
+    ax0.scatter([list(data[x_key])[-1]], [list(data[y_key])[-1]], color="#008888")
 
 for index, (column_start_series, column_end_series) in enumerate(elevation_columns):
     color = colors[index % len(colors)]
@@ -194,7 +241,7 @@ for index, (column_start_series, column_end_series) in enumerate(elevation_colum
         xy=(midpoint_az - width / 2, midpoint_el - line_length / 2),
         height=line_length,
         width=width,
-        color=f"#{color}22",
+        color=f"#{color}{ALPHA}",
         # rotation_point="center",
     )
     rotation_angle = math.atan2((end_el-start_el), (end_az-start_az))
@@ -206,3 +253,16 @@ for index, (column_start_series, column_end_series) in enumerate(elevation_colum
     pass
 
 plt.show()
+
+# fig, ax0 = plt.subplots()
+# ax0: plt.Axes
+# ax0.axvline(2945, label="Where you actually start", color="#ff0000")
+# ax0.axvline(2975, label="Where you want to start", color="#00ff00")
+# ax0.axhline(30, label="Example elevation (30 deg)", color="#888888")
+# ax0.plot(data["elapsed"], data["azimuth"], label="azimuth")
+# ax0.plot(data["elapsed"], data["elevation"], label="elevation")
+# ax0.set_xlabel("elapsed")
+# ax0.set_ylabel("azimuth/elevation")
+
+# ax0.legend()
+# plt.show()

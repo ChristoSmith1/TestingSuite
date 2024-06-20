@@ -1,0 +1,463 @@
+
+import functools
+import random
+from typing import Generic, Iterable, TypeVar, overload
+
+from matplotlib import pyplot as plt
+
+
+T = TypeVar("T", int, float)
+
+@functools.total_ordering
+class ClosedIntervalAtomic(Generic[T]):
+    def __init__(
+        self,
+        minimum: T,
+        maximum: T | None = None,
+        *,
+        dtype: type[T] | None = None
+    ) -> None:
+        self.minimum = minimum
+        if maximum is not None:
+            self.maximum = maximum
+        else:
+            self.maximum = self.minimum
+        self._dtype = dtype
+
+    @property
+    def dtype(self) -> type[T] | None:
+        if self._dtype:
+            return self._dtype
+        else:
+            return type(self.minimum)
+
+    def __contains__(self, value: int) -> bool:
+        return self.minimum <= value and value <= self.maximum
+    
+    def _atomic_union(self, other: "ClosedIntervalAtomic[T]") -> "ClosedIntervalAtomic[T]":
+        if not self.can_union(other):
+            raise ValueError(f"{self} and {other} do not overlap")
+        return ClosedIntervalAtomic(
+            minimum=min(self.minimum, other.minimum),
+            maximum=max(self.maximum, other.maximum),
+        )
+    
+    def _atomic_intersection(self, other: "ClosedIntervalAtomic[T]") -> "ClosedIntervalAtomic[T]":
+        if not self.can_intersect(other):
+            raise ValueError(f"{self} and {other} do not overlap")
+        return ClosedIntervalAtomic(
+            minimum=max(self.minimum, other.minimum),
+            maximum=min(self.maximum, other.maximum),
+        )
+    
+    def _atomic_difference(self, other: "ClosedIntervalAtomic[T]") -> "ClosedInterval[T]":
+        """Note that this one DOES NOT return an atomic, since we can split the atomic:
+
+        [0,30] - [11,19] == [0,10]u[20,30]
+
+        This will only be defined for int, because there's not an obvious answer to what it would
+        mean (since we don't have an `OpenInterval` type in here yet.)
+        """
+        if not issubclass(self.dtype, int):
+            raise TypeError(f"Only defined for int types. dtype={self.dtype!r}")
+        if not self.can_intersect(other):
+            return self
+        
+        return_value = ClosedInterval(dtype=self._dtype)
+        left_interval_min = self.minimum
+        left_interval_max = other.minimum - 1
+        if left_interval_min <= left_interval_max:
+            return_value.add(ClosedIntervalAtomic(left_interval_min, left_interval_max, dtype=self._dtype))
+
+        right_interval_min = other.maximum + 1
+        right_interval_max = self.maximum
+        if right_interval_min <= right_interval_max:
+            return_value.add(ClosedIntervalAtomic(right_interval_min, right_interval_max, dtype=self._dtype))
+        
+        return return_value
+        
+
+    def is_int(self) -> bool:
+        return issubclass(self.dtype, int)
+
+    def overlaps(self, other: "ClosedIntervalAtomic[T]") -> bool:
+        return (
+            self.minimum in other
+            or self.maximum in other
+            or other.minimum in self
+            or other.maximum in self
+        )
+    
+    def can_intersect(self, other: "ClosedIntervalAtomic") -> bool:
+        return self.overlaps(other)
+
+    def can_union(self, other: "ClosedIntervalAtomic") -> bool:
+        if self.overlaps(other):
+            return True
+        elif self.is_int():
+            # See if the endpoints are neighboring:
+            # Can union [0,50] and [51,100]
+            if (
+                self.maximum == other.minimum - 1
+                or other.maximum == self.minimum - 1
+            ):
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def __eq__(self, other: "ClosedIntervalAtomic[T]") -> bool:
+        return (self.minimum, self.maximum) == (other.minimum, other.maximum)
+
+    def __lt__(self, other: "ClosedIntervalAtomic[T]") -> bool:
+        return (self.minimum, self.maximum) < (other.minimum, other.maximum)
+    
+    def __str__(self) -> str:
+        if self.minimum == self.maximum:
+            return "{" + f"{self.minimum}" + "}"
+        return f"[{self.minimum},{self.maximum}]"
+    
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.minimum!r}, {self.maximum!r})"
+
+
+class ClosedInterval(Generic[T]):
+    @overload
+    def __init__(self, *, dtype: type[T] | None = None) -> None: ...
+    @overload
+    def __init__(self, minimum: T, maximum: T | None = None, /, *, dtype: type[T] | None = None) -> None: ...
+    @overload
+    def __init__(self, atomic: ClosedIntervalAtomic[T], /, *, dtype: type[T] | None = None) -> None: ...
+    @overload
+    def __init__(self, atomics: Iterable[ClosedIntervalAtomic[T]], /, *, dtype: type[T] | None = None) -> None: ...
+    def __init__(self, *values, dtype: type[T] | None = None) -> None:
+        self._atomics: list[ClosedIntervalAtomic[T]] = []
+        self._dtype = dtype
+        if len(values) == 0:
+            return
+        elif len(values) == 2:
+            self._add_atomic(ClosedIntervalAtomic(values[0], values[1], dtype=dtype))
+            return
+        
+        atomic_or_atomics = values[0]
+        if isinstance(atomic_or_atomics, ClosedIntervalAtomic):
+            self.add(atomic_or_atomics)
+        else:
+            for atomic in atomic_or_atomics:
+                self.add(atomic)
+
+    @property
+    def dtype(self) -> type[T] | None:
+        if self._dtype:
+            return self._dtype
+        for atomic in self._atomics:
+            if atomic.dtype:
+                return atomic.dtype
+        return None
+
+    def as_tuples(self):
+        return (
+            (atomic.minimum, atomic.maximum)
+            for atomic
+            in self._atomics
+        )
+
+    def _cleanup_atomics(self, index: int):
+        """Merge the atomics, if possible. ASSUMES SORTED ATOMICS AS A PRECONDITION!"""
+        found_something = False
+        base_atomic = self._atomics[index]
+        compare_indexes: list[int] = []
+        if index > 0:
+            # check left
+            compare_indexes.append(index - 1)
+        if index < len(self._atomics) - 1:
+            # check right
+            compare_indexes.append(index + 1)
+        
+        for compare_index in compare_indexes:
+            compare_atomic = self._atomics[compare_index]
+            if compare_atomic.can_union(base_atomic):
+                found_something = True
+                lower_index = min(index, compare_index)
+                upper_index = max(index, compare_index)
+                self._atomics[lower_index] = compare_atomic._atomic_union(base_atomic)
+                del self._atomics[upper_index]
+                break
+
+        if found_something:
+            self._cleanup_atomics(lower_index)
+
+    def __contains__(self, value: T) -> bool:
+        for atomic in self._atomics:
+            if value in atomic:
+                return True
+        return False
+
+    @overload
+    def add(self, value: T) -> None: ...
+    @overload
+    def add(self, atomic: ClosedIntervalAtomic) -> None: ...
+    @overload
+    def add(self, interval: "ClosedInterval") -> None: ...
+    def add(self, item):
+        if isinstance(item, ClosedIntervalAtomic):
+            self._add_atomic(item)
+        elif isinstance(item, ClosedInterval):
+            self._add_interval(item)
+        else:
+            self._add_value(item)
+
+    def __or__(
+        self,
+        other: "ClosedInterval[T]" | ClosedIntervalAtomic[T] | T
+    ) -> "ClosedInterval[T]":
+        return _union(self, other)
+    
+    def __ror__(
+        self,
+        other: "ClosedInterval[T]" | ClosedIntervalAtomic[T] | T
+    ) -> "ClosedInterval[T]":
+        return _union(self, other)
+    
+    def __and__(
+        self,
+        other: "ClosedInterval[T]" | ClosedIntervalAtomic[T] | T
+    ) -> "ClosedInterval[T]":
+        return _intersect(self, other)
+    
+    def __rand__(
+        self,
+        other: "ClosedInterval[T]" | ClosedIntervalAtomic[T] | T
+    ) -> "ClosedInterval[T]":
+        return _intersect(self, other)
+
+    def _add_value(self, value: T) -> None:
+        self._add_atomic(ClosedIntervalAtomic(value, value))
+
+    def _add_interval(self, interval: "ClosedInterval") -> None:
+        for atomic in interval._atomics:
+            self._add_atomic(atomic)
+
+    def _add_atomic(self, interval: ClosedIntervalAtomic) -> None:
+        is_new = True
+        for index, atomic in enumerate(self._atomics):
+            if atomic.can_union(interval):
+                self._atomics[index] = atomic._atomic_union(interval)
+                is_new = False
+                break
+        
+        if is_new:
+            self._atomics.append(interval)
+            self._atomics.sort()
+        else:
+            self._cleanup_atomics(index)
+            pass
+
+    def difference(self, other: "ClosedIntervalAtomic[T] | ClosedInterval[T]") -> "ClosedInterval[T]":
+        if isinstance(other, ClosedIntervalAtomic):
+            return self._difference_atomic(other)
+        else:
+            return self._difference_interval(other)
+
+    def _difference_atomic(self, other: ClosedIntervalAtomic[T]) -> "ClosedInterval[T]":
+        return_value: ClosedInterval[T] = ClosedInterval(dtype=self._dtype)
+        for index, atomic in enumerate(self._atomics):
+            return_value.add(atomic._atomic_difference(other))
+        return return_value
+
+    def _difference_interval(self, other: "ClosedInterval[T]") -> "ClosedInterval[T]":
+        return_value: ClosedInterval[T] = ClosedInterval(self, dtype=self._dtype)
+        for atomic in other._atomics:
+            return_value = return_value._difference_atomic(atomic)
+        return return_value
+
+    def symmetric_difference(self, other: "ClosedIntervalAtomic[T] | ClosedInterval[T]") -> "ClosedInterval[T]":
+        return self.union(other).difference(self.intersect(other))
+
+    def union(
+        self,
+        other: "ClosedIntervalAtomic[T] | ClosedInterval[T]"
+    ) ->"ClosedInterval[T]":
+        return _union(self, other)
+
+    def intersect(
+        self,
+        other: "ClosedIntervalAtomic[T] | ClosedInterval[T]"
+    ) ->"ClosedInterval[T]":
+        if isinstance(other, ClosedIntervalAtomic):
+            return self._intersect_atomic(other)
+        else:
+            return self._intersect_interval(other)
+
+    def _intersect_atomic(self, other: ClosedIntervalAtomic[T]) -> "ClosedInterval[T]":
+        return_value = ClosedInterval(dtype=self._dtype)
+        for self_atomic in self._atomics:
+            if self_atomic.can_intersect(other):
+                individual_intersection = self_atomic._atomic_intersection(other)
+                return_value.add(individual_intersection)
+        return return_value
+    
+    def _intersect_interval(self, other: "ClosedInterval[T]") -> "ClosedInterval[T]":
+        return_value = ClosedInterval(dtype=self._dtype)
+        for other_atomic in other._atomics:
+            return_value.add(self._intersect_atomic(other_atomic))
+        return return_value
+    
+
+    def __iter__(self):
+        return (
+            ClosedInterval([atomic])
+            for atomic
+            in self._atomics
+        )
+
+    def __str__(self) -> str:
+        if not self._atomics:
+            return "{}"
+        return "u".join((str(atomic) for atomic in self._atomics))
+    
+    def __repr__(self) -> str:
+        if len(self._atomics) == 0:
+            return f"{self.__class__.__name__}()"
+        if len(self._atomics) == 1:
+            return f"{self.__class__.__name__}({self._atomics[0].minimum}, {self._atomics[0].maximum})"
+        atomics_string = ", ".join([
+            repr(ClosedInterval(atomic))
+            for atomic
+            in self._atomics
+        ])
+        return f"{self.__class__.__name__}({atomics_string})"
+
+
+def _union(
+        left: ClosedInterval[T] | ClosedIntervalAtomic[T] | T,
+        right: ClosedInterval[T] | ClosedIntervalAtomic[T] | T,
+    ) -> ClosedInterval[T]:
+    return_value = ClosedInterval()
+    return_value.add(left)
+    return_value.add(right)
+    return return_value
+
+def _intersect(
+    left: ClosedInterval[T] | ClosedIntervalAtomic[T] | T,
+    right: ClosedInterval[T] | ClosedIntervalAtomic[T] | T,
+) -> ClosedInterval[T]:
+    # TODO
+    ...
+
+
+if __name__ == "__main__":
+    interval_1 = ClosedIntervalAtomic(5, 10)
+    interval_2 = ClosedIntervalAtomic(12, 15)
+    # print(f"{interval_1=!s}")
+    # print(f"{interval_1=!r}")
+
+    # union = interval_1.union(interval_2)
+    # print(f"{union=!s}")
+
+    # intersection = interval_1.intersection(interval_2)
+    # print(f"{intersection=!s}")
+
+    closed = ClosedInterval([interval_1, interval_2])
+    closed.add(11)
+    print(f"{closed = !r}")
+    print(f"{closed = !s}")
+
+    closed = _union(closed, ClosedIntervalAtomic(50, 60))
+    closed = _union(ClosedIntervalAtomic(61, 70), closed)
+    closed |= ClosedIntervalAtomic(100,150)
+    closed |= 0
+    closed |= 1
+    closed |= 3
+    print(f"{closed=!s}")
+    print(f"{closed=!r}")
+    print(closed.dtype)
+
+    for index, atomic in enumerate(closed):
+        print(f"{index=} {atomic=!r}")
+
+    closed_2 = ClosedInterval([
+        ClosedInterval(0,10),
+        ClosedInterval(30,40),
+        ClosedInterval(60,200),
+    ])
+
+    # intersect = closed.intersect_atomic(ClosedIntervalAtomic(25, 30))
+    # print(f"{intersect = !s}")
+
+    intersect = closed.intersect(closed_2)
+    print(f"{intersect = !s}")
+
+    def random_color():
+        rv = "#"
+        for _ in range(6):
+            rv += random.choice("89ABCEDF")
+        return rv
+
+
+
+    def plot(a: ClosedInterval, b: ClosedInterval):
+        fig, ax = plt.subplots()
+        ax: plt.Axes
+        intersection = a.intersect(b)
+        union = a.union(b)
+        colors = ["red", "green", "orange", "blue"]
+        names = [
+            f"A = {a}",
+            f"B = {b}",
+            f"A | B = {union}",
+            f"A & B = {intersection}"
+        ]
+        things = [
+            (f"A", a, random_color()),
+            (f"B", b, random_color()),
+            (f"A | B", a.union(b), random_color()),
+            (f"A & B", a.intersect(b), random_color()),
+            (f"A ^ B", a.symmetric_difference(b), random_color()),
+            (f"A - B", a.difference(b), random_color()),
+            (f"B - A", b.difference(a), random_color()),
+        ]
+        for index, (label, interval, color) in enumerate(things):
+        # for index, interval in enumerate([a, b, intersection, union]):
+            color = random_color()
+            # name = names[index]
+            name = label
+            for tup in interval.as_tuples():
+                ax.plot(tup, [4-index, 4-index], color=color, label=name)
+                ax.scatter(tup, [4-index, 4-index], color=color, label=name)
+            ax.text(0, 4-index, name)
+        handles, labels = ax.get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+
+        ax.legend(by_label.values(), by_label.keys())
+        ax.set_ylim(-5,5)
+        plt.show()
+
+    left = ClosedInterval((
+        ClosedInterval(0,50),
+        ClosedInterval(80,100),
+    ))
+
+    right = ClosedInterval((
+        ClosedInterval(30,60),
+        ClosedInterval(75,100),
+    ))
+
+    random.seed(40351)
+    left = ClosedInterval(dtype=int)
+    right = ClosedInterval(dtype=int)
+    for _ in range(10):
+        left.add(random.randint(0,10))
+        right.add(random.randint(0,10))
+
+    plot(left, right)
+
+    print(f"{closed = !s}")
+    diff = closed.symmetric_difference(
+        ClosedInterval([
+            ClosedIntervalAtomic(125, 130),
+            ClosedIntervalAtomic(135, 140),
+        ])
+    )
+    print(f"{diff = !s}")
