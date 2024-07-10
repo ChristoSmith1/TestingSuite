@@ -17,26 +17,26 @@ from scipy.interpolate import BSpline
 from scipy.interpolate import make_interp_spline
 from combined_filtered_analysis import y_factor_criteria
 
-# # INPUT DATA PATHS
-# # Paths to data from 2024-04-21 test
-# POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
-# PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
-# HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
-
-# # OUTPUT DATA PATHS
-# COMBINED_DATA_PATH = R"april21govert\combined_Xband_April.csv"
-# FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
-
-
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"MSU_PowerMeter_GoverT_03262024_0230UTC_1.csv"
-PX6_DATA_PATH = R"GTpoint03252024.txt"
-HWCTRL_LOG_DATA_PATH = R"newEvent_176_D086T01_59_45.txt"
+POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
+HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
 
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"april21govert\combined_Sband_April.csv"
-FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_SBand_March.csv"
+COMBINED_DATA_PATH = R"april21govert\combined_Xband_April.csv"
+FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
+
+
+# # INPUT DATA PATHS
+# # Paths to data from 2024-04-21 test
+# POWER_METER_DATA_PATH = R"MSU_PowerMeter_GoverT_03262024_0230UTC_1.csv"
+# PX6_DATA_PATH = R"GTpoint03252024.txt"
+# HWCTRL_LOG_DATA_PATH = R"newEvent_176_D086T01_59_45.txt"
+
+# # OUTPUT DATA PATHS
+# COMBINED_DATA_PATH = R"april21govert\combined_Sband_April.csv"
+# FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_SBand_March.csv"
 
 if __name__ == "__main__":
     print(f"START OF SCRIPT {__file__}")
