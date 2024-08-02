@@ -1,9 +1,11 @@
 import dataclasses
 import datetime
 import functools
+import logging
 import math
 import itertools
 from pathlib import Path
+import sys
 from typing import Literal
 
 from matplotlib.offsetbox import AnchoredText
@@ -14,8 +16,43 @@ import pandas as pd
 
 from g_over_t import add_elapsed_time_column
 
-# FILTERED_COMBINED_DATA_PATH = R"april21govert/combined_filtered_SBand_March.csv"
-FILTERED_COMBINED_DATA_PATH = R"april21govert/combined_filtered_XBand_April.csv"
+
+logger = logging.getLogger(__file__)
+
+try:
+    # import nonexistent_package
+    import rich
+    from rich import logging as rich_logging
+
+    rich_handler = rich_logging.RichHandler(
+        omit_repeated_times=False,
+        log_time_format="%X",
+        level=logging.DEBUG,
+        show_path=True,
+        rich_tracebacks=True,
+    )
+    rich_handler.set_name("console")
+    logger.addHandler(rich_handler)
+except ImportError:
+    screen_handler = logging.StreamHandler(stream=sys.stdout)
+    screen_handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        fmt="%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        datefmt="%H:%M:%S"
+    )
+    screen_handler.setFormatter(formatter)
+    screen_handler.set_name("console")
+    logger.addHandler(screen_handler)
+    rich = None
+    rich_logging = None
+
+logger.setLevel(logging.DEBUG)
+logger.info("INFO MESSAGE")
+logger.debug("DEBUG MESSAGE")
+try:
+    1/0
+except Exception as exc:
+    logger.error(exc, exc_info=exc)
 
 
 @dataclasses.dataclass(unsafe_hash=True)
@@ -28,14 +65,13 @@ class TestInfo:
         # Read from CSV, if dataframe not given
         # self.csv_path = self.csv_path
         self._data: pd.DataFrame | None = None
-        
 
     @property
     def data(self) -> pd.DataFrame:
         if self._data is not None:
             return self._data
         
-        print(f"Attempting to read data from {self.csv_path}")
+        logger.info(f"Attempting to read data from {self.csv_path}")
         self._data = pd.read_csv(
             self.csv_path,
             parse_dates=["timestamp"]
@@ -46,7 +82,7 @@ class TestInfo:
             self._data is not None
             and "elapsed" not in self._data.columns
         ):
-            print(f"Adding 'elapsed' column.")
+            logger.debug(f"Adding 'elapsed' column.")
             self._data = add_elapsed_time_column(self._data)
 
         return self._data
@@ -63,13 +99,13 @@ class TestInfo:
         prefer_y: tuple[str] = ("power", ),
     ) -> tuple[plt.Figure, list[plt.Axes]]:
         numeric_data = self.data.select_dtypes(include="number")
-        print(f"{numeric_data.columns=}")
+        logger.debug(f"{numeric_data.columns=}")
 
         columns = [column for column in numeric_data.columns if column not in ignore]
-        print(f"{columns=}")
+        logger.debug(f"{columns=}")
 
         combos = list(itertools.combinations(columns, 2))
-        print(f"{combos=}")
+        logger.debug(f"{combos=}")
         in_order_combos = []
         for index, (col1, col2) in enumerate(combos):
             x_col, y_col = col1, col2
@@ -82,17 +118,17 @@ class TestInfo:
             elif col2 in prefer_y:
                 x_col, y_col = col1, col2
             in_order_combos.append((x_col, y_col))
-            print(f"{index=} {x_col=} {y_col=}")
-        print(f"{in_order_combos=}")
+            logger.debug(f"{index=} {x_col=} {y_col=}")
+        logger.debug(f"{in_order_combos=}")
 
         n = len(combos)
         nrows = math.floor(math.sqrt(n))
         ncols = math.ceil(n / nrows)
 
-        print(f"{n=} {nrows=} {ncols=}")
+        logger.debug(f"{n=} {nrows=} {ncols=}")
 
         fig, raw_ax = plt.subplots(nrows, ncols, layout="constrained")
-        print(f"{fig=} {raw_ax=}")
+        logger.debug(f"{fig=} {raw_ax=}")
         fig.suptitle(f"{self.description}   {self.csv_path}\n({len(numeric_data):,} total points; {len(numeric_data):,} points shown)")
 
         ax_2d: list[list[plt.Axes]]
@@ -108,11 +144,11 @@ class TestInfo:
         for ax_row in ax_2d:
             for ax in ax_row:
                 if index >= n:
-                    print(f"Removing index {index}")
+                    logger.debug(f"Removing index {index}")
                     ax.remove()
                 else:
                     x_col, y_col = in_order_combos[index]
-                    print(f"{index=} {x_col=} {y_col=}")
+                    logger.debug(f"{index=} {x_col=} {y_col=}")
                     ax.plot(numeric_data[x_col], numeric_data[y_col])
                     first_point = (numeric_data[x_col].iloc[0], numeric_data[y_col].iloc[0])
                     last_point = (numeric_data[x_col].iloc[-1], numeric_data[y_col].iloc[-1])
@@ -159,18 +195,41 @@ s_band_test = TestInfo(
 
 test = x_band_test
 # test = s_band_test
-print(test)
-print(test.data.columns)
-print(f"{test.data.dtypes=}")
-# print(f"{x_band_test.data.head()}")
-# print("----")
-# print(f"{x_band_test.data.iloc[0]}")
+logger.info(test)
+logger.info(test.data.columns)
+logger.info(f"{test.data.dtypes=}")
 
-print(f"{test.duration()=}")
+
+logger.info(f"{test.duration()=}")
 
 fig, ax = test.all_plots()
+logger.info("Calling plt.show(). Control shifting to matplotlib window . . .")
 plt.show()
+logger.info("Control returned from matplotlib window.")
+
 
 # converted = pd.to_datetime(x_band_test.data["timestamp"])
 
 pass
+
+
+class ElevationColumn:
+    def __init__(
+        self,
+        test_info: TestInfo,
+        *,
+        immediate: bool = True
+    ) -> None:
+        self.test_info = test_info
+        self._columns: None | list = None
+        if immediate:
+            self._find_columns()
+
+    @property
+    def columns(self):
+        if self._columns is None:
+            self._find_columns()
+        return self._columns
+
+    def _find_columns(self) -> None:
+        pass
