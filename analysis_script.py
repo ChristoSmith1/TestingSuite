@@ -13,8 +13,8 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import g_over_t
 
-from scipy.interpolate import BSpline
-from scipy.interpolate import make_interp_spline
+# from scipy.interpolate import BSpline
+# from scipy.interpolate import make_interp_spline
 from combined_filtered_analysis import y_factor_criteria
 
 # INPUT DATA PATHS
@@ -115,23 +115,25 @@ if __name__ == "__main__":
     # dictionary for key "azimuth" and key "elevation"
     # 
     # SOLUTION IN THE FUTURE: Fix the `g_over_t.parse_hwctrl_log_file()` function to output the correct keys.
-    for row_dictionary in hwctrl_data:
-        # Get the actual azimuth value
-        actual_azimuth = row_dictionary["actual_azimuth"]
+    
+    # g_over_t.parse_hwctrl_log_file() was fixed on 2024-08-09, so this is not necessary.
+    # for row_dictionary in hwctrl_data:
+    #     # Get the actual azimuth value
+    #     actual_azimuth = row_dictionary["actual_azimuth"]
 
-        # Save that azimuth value back to the dictionary with the key "azimuth"
-        row_dictionary["azimuth"] = actual_azimuth
+    #     # Save that azimuth value back to the dictionary with the key "azimuth"
+    #     row_dictionary["azimuth"] = actual_azimuth
 
-        # Get the actual elevation value
-        actual_elevation = row_dictionary["actual_elevation"]
+    #     # Get the actual elevation value
+    #     actual_elevation = row_dictionary["actual_elevation"]
 
-        # Save that elevation value back to the dictionary with the key "elevation"
-        row_dictionary["elevation"] = actual_elevation
+    #     # Save that elevation value back to the dictionary with the key "elevation"
+    #     row_dictionary["elevation"] = actual_elevation
 
-    print(f"**** AFTER ADDING 'azimuth' AND 'elevation' KEYS *****")
-    print(f"`hwctrl_data`  after modification")
-    print_raw_data_info(hwctrl_data)
-    print()
+    # print(f"**** AFTER ADDING 'azimuth' AND 'elevation' KEYS *****")
+    # print(f"`hwctrl_data`  after modification")
+    # print_raw_data_info(hwctrl_data)
+    # print()
 
 
     # A MUCH MORE SUBTLE PROBLEM
@@ -141,6 +143,9 @@ if __name__ == "__main__":
     # So when we convert those to POSIX time (which is the number of seconds elapsed
     # since 1970-01-01 00:00:00 UTC), the ones that don't know they are UTC times get
     # treated as local time times, and the values are off by 3600 * 4 = 14400 seconds.
+    #
+    # CHANGED 2024-08-09: The timezone of the data from `read_px6_data()` is now
+    # UTC automatically, so this is not a problem anymore.
     def print_timezone(data: list[dict[str, Any]]) -> None:
         """Print the timezone info of the "timestamp" value of the first row's
         row dictionary"""
@@ -193,18 +198,18 @@ if __name__ == "__main__":
                         # Replace the existing value in the row dictionary with this new thing
                         row_dictionary[key] = new_timestamp
 
-    print(f"***** Fixing timestamps *****")
-    fix_timestamps(hwctrl_data)
-    fix_timestamps(px6_data)
-    fix_timestamps(power_meter_data)
-    print(f'***** Time zone attribute of "timestamp" values [AFTER FIX] *****')
-    print("`hwctrl_data`:      ", end="")
-    print_timezone(hwctrl_data)
-    print("`px6_data`:         ", end="")
-    print_timezone(px6_data)
-    print("`power_meter_data`: ", end="")
-    print_timezone(power_meter_data)
-    print()
+    # print(f"***** Fixing timestamps *****")
+    # fix_timestamps(hwctrl_data)
+    # fix_timestamps(px6_data)
+    # fix_timestamps(power_meter_data)
+    # print(f'***** Time zone attribute of "timestamp" values [AFTER FIX] *****')
+    # print("`hwctrl_data`:      ", end="")
+    # print_timezone(hwctrl_data)
+    # print("`px6_data`:         ", end="")
+    # print_timezone(px6_data)
+    # print("`power_meter_data`: ", end="")
+    # print_timezone(power_meter_data)
+    # print()
 
     # After applying those fixes, we can properly combine our data!
     print(f"***** Combining data (might take awhile) *****")
@@ -222,44 +227,10 @@ if __name__ == "__main__":
 
 
 
-    # FILTER OUT THE NANS
-    # This should also go in `g_over_t`
-    def filter_out_nan(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Create a copy of the data, but any row that has any NaN value (for any key) will be thrown out"""
-        data_copy = data.copy()
-
-        # A little trick! I use this trick all the time, but I think I'm the only one.
-        # 
-        # We're going to be deleting rows from the list. If we start at the beginning of the list and delete
-        # an item, it will mess up the indexes later in iteration. (If we delete index=5, then what used to be
-        # in index=6 is now in index=5, and if I then move on to the next index (6), I'll never inspect the old
-        # index=6, which is the new index=5, and move on to the new index=6, which was the old index=7.)
-        # 
-        # Instead of dealing with all that, we go backwards: Start at the biggest index, then count down to 0
-        # Then we just delete the relevant ones as we find them and everything is fine.
-        # 
-        # (This is also guaranteed to be faster because of computer science reasons. Deleting an item from a list takes
-        # an amount of time proportional to how many items exist between the index you're deleting and the end of
-        # the list.)
-        reversed_indexes = list(reversed(range(len(data))))
-        for index in reversed_indexes:
-            row = data_copy[index]
-            found_any_nan = False
-            for value in row.values():
-                try:
-                    if math.isnan(value):
-                        found_any_nan = True
-                        break
-                        # print(f"Found a nan at index={index}")
-                except TypeError:
-                    pass
-            if found_any_nan:
-                # data_copy.pop(index)
-                del data_copy[index]
-        return data_copy
+    
 
 
-    valid_combined_data = filter_out_nan(combined_data)
+    valid_combined_data = g_over_t.filter_out_nan(combined_data)
 
     print(f"***** SUMMARY OF `filtered_combined_data` *****")
     print_raw_data_info(valid_combined_data)

@@ -1,6 +1,7 @@
 import csv
-from datetime import UTC, datetime, timedelta, time
+from datetime import UTC, datetime, timedelta, time, timezone
 import functools
+import math
 from pathlib import Path
 import re
 from typing import Any, Literal, Protocol, Sequence
@@ -12,6 +13,42 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 def hello_world(message: str):
     print (f"Hello {message}")
 
+# FILTER OUT THE NANS
+# This should also go in `g_over_t`
+def filter_out_nan(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Create a copy of the data, but any row that has any NaN value (for any key) will be thrown out"""
+    data_copy = data.copy()
+
+    # A little trick! I use this trick all the time, but I think I'm the only one.
+    # 
+    # We're going to be deleting rows from the list. If we start at the beginning of the list and delete
+    # an item, it will mess up the indexes later in iteration. (If we delete index=5, then what used to be
+    # in index=6 is now in index=5, and if I then move on to the next index (6), I'll never inspect the old
+    # index=6, which is the new index=5, and move on to the new index=6, which was the old index=7.)
+    # 
+    # Instead of dealing with all that, we go backwards: Start at the biggest index, then count down to 0
+    # Then we just delete the relevant ones as we find them and everything is fine.
+    # 
+    # (This is also guaranteed to be faster because of computer science reasons. Deleting an item from a list takes
+    # an amount of time proportional to how many items exist between the index you're deleting and the end of
+    # the list.)
+    reversed_indexes = list(reversed(range(len(data))))
+    for index in reversed_indexes:
+        row = data_copy[index]
+        found_any_nan = False
+        for value in row.values():
+            try:
+                if math.isnan(value):
+                    found_any_nan = True
+                    break
+                    # print(f"Found a nan at index={index}")
+            except TypeError:
+                pass
+        if found_any_nan:
+            # data_copy.pop(index)
+            del data_copy[index]
+    return data_copy
+
 def _parse_time(year: int, days: int, time: str,) -> datetime:
     """convert time and date to datetime object"""
     jan_1 = datetime(year,1,1)
@@ -19,7 +56,14 @@ def _parse_time(year: int, days: int, time: str,) -> datetime:
     date_in_px6 = jan_1 + delta_after_jan1
     # print(f"{jan_1} {delta_after_jan1} {date_in_px6}")
 
-    utc_time = datetime.strptime(time, "%H:%M:%S.%f").replace(year=date_in_px6.year, month=date_in_px6.month, day=date_in_px6.day)
+    # CHANGED 2024-08-09:
+    # UTC time zone added. (Previously, `datetime` object was naive)
+    utc_time = datetime.strptime(time, "%H:%M:%S.%f").replace(
+        year=date_in_px6.year,
+        month=date_in_px6.month,
+        day=date_in_px6.day,
+        # tzinfo=timezone.utc,
+    )
     return utc_time 
     pass
 
@@ -62,6 +106,7 @@ def read_power_file(path: str) -> list [dict[str, datetime | float]]:
         for row_dict in csv_reader:
             timestamp_str = row_dict["timestamp"]
             timestamp_dt = datetime.fromisoformat(timestamp_str)
+            timestamp_dt = timestamp_dt.replace(tzinfo=timezone.utc)
             power_float = float(row_dict["power"])
             row_dict["power"] = power_float
             row_dict["timestamp"] = timestamp_dt
@@ -297,6 +342,8 @@ def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime | float]]:
             "actual_elevation"
             "commanded_azimuth"
             "commanded_elevation"
+            "azimuth"
+            "elevation"
     Args:
         text (str): _description_
 
@@ -317,10 +364,14 @@ def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime | float]]:
         )
         time_hwctrl = time.fromisoformat(groupdict["time"])
         timestamp = datetime.combine(date_dt.date(), time_hwctrl, tzinfo=UTC)
+        
+        # NOTE: Changed the keys on 2024-08-09:
+        # "actual_azimuth" -> "azimuth"
+        # "actual_elevation" -> "elevation"
         rv.append({
             "timestamp": timestamp,
-            "actual_azimuth": float(groupdict["actual_azimuth"]),
-            "actual_elevation": float(groupdict["actual_elevation"]),
+            "azimuth": float(groupdict["actual_azimuth"]),
+            "elevation": float(groupdict["actual_elevation"]),
             "commanded_azimuth": float(groupdict["commanded_azimuth"]),
             "commanded_elevation": float(groupdict["commanded_elevation"]),
         })

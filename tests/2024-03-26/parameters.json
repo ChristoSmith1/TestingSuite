@@ -1,0 +1,12 @@
+{
+    "description": "Test from March 26. ?-Band, ? on/off moon(s), ? elevation columns",
+    "power_meter_data_relative_path": "raw_data\\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv",
+    "px6_data_relative_path": "raw_data\\GTprocedure20240421.txt",
+    "hwctrl_log_data_relative_path": "raw_data\\GTAUTO.176.D113T00-27-51",
+    "combined_data_csv_relative_path": "analysis_data\\data.csv",
+    "parameters_relative_path": "tests\\2024-03-26\\parameters.json",
+    "pointing_data_source": "hwctrl",
+    "analysis_results": {
+        "elevation_columns": null
+    }
+}
