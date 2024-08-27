@@ -179,6 +179,8 @@ class TestInfo:
         path.mkdir(parents=True, exist_ok=True)
         info = TestInfo()
         info.write_parameters(path / "paramaters.json")
+        raw_data_folder_path = path / "raw_data"
+        raw_data_folder_path.mkdir(parents=True, exist_ok=True)
 
     def write_data(self, path: Path | str | None = None) -> None:
         if not path and not self.combined_data_csv_relative_path:
@@ -268,11 +270,11 @@ class TestInfo:
 
 if __name__ == "__main__":
     # logger.setLevel("INFO")
-    meta_data = TestInfo.load(R"tests\2024-03-26")
-    logger.info(f"{meta_data=}")
+    meta_data = TestInfo.load(R"tests\2024-04-22")
+    # logger.info(f"{meta_data=}")
     logger.info(f"{meta_data.data}")
     # meta_data._create_combined_data()
     # meta_data.analysis_results.elevation_columns = [IndexInterval(0, 200)]
     # meta_data.write_parameters()
 
-    TestInfo.init(R"tests\sample")
+    # TestInfo.init(R"tests\sample")
