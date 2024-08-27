@@ -32,7 +32,7 @@ class AnalysisResults:
     
 
 @dataclasses.dataclass
-class TestParams:
+class TestInfo:
     """Metadata about a given test"""
     description: str = ""
     power_meter_data_relative_path: Path | None = dataclasses.field(default=None, repr=False)
@@ -237,7 +237,7 @@ class TestParams:
 
 
     @classmethod
-    def load(cls, path: Path | str) -> "TestParams":
+    def load(cls, path: Path | str) -> "TestInfo":
         path = Path(path)
         if not path.exists():
             raise FileNotFoundError(f"The file/folder does not exist: {path}")
@@ -255,14 +255,14 @@ class TestParams:
             logger.debug(f"Loading metadata from '{path}'")
             dictionary = json.loads(path.read_text())
             dictionary["parameters_relative_path"] = path
-            rv = TestParams(**dictionary)
+            rv = TestInfo(**dictionary)
             logger.debug(f"Loaded metadata for test folder '{rv.test_folder_path}'")
             return rv
 
 
 if __name__ == "__main__":
     # logger.setLevel("INFO")
-    meta_data = TestParams.load(R"tests\2024-03-26")
+    meta_data = TestInfo.load(R"tests\2024-03-26")
     logger.info(f"{meta_data=}")
     logger.info(f"{meta_data.data}")
     meta_data._create_combined_data()
