@@ -38,7 +38,10 @@ class TestInfo:
     power_meter_data_relative_path: Path | None = dataclasses.field(default=None, repr=False)
     px6_data_relative_path: Path | None = dataclasses.field(default=None, repr=False)
     hwctrl_log_data_relative_path: Path | None = dataclasses.field(default=None, repr=False)
-    combined_data_csv_relative_path: Path | None = dataclasses.field(default=None, repr=False)
+    combined_data_csv_relative_path: Path | None = dataclasses.field(
+        default=Path("analysis_data/data.csv"),
+        repr=False,
+    )
     parameters_relative_path: Path | None = dataclasses.field(default=None, repr=False)
     pointing_data_source: Literal["hwctrl", "px6"] = "hwctrl"
     # test_folder_path: Path | None = dataclasses.field(default=None, repr=False)
@@ -51,6 +54,7 @@ class TestInfo:
             self.px6_data_relative_path = Path(self.px6_data_relative_path)
         if self.hwctrl_log_data_relative_path is not None:
             self.hwctrl_log_data_relative_path = Path(self.hwctrl_log_data_relative_path)
+            self.combined_data_csv_relative_path = Path("./analysis_data.csv")
         if self.combined_data_csv_relative_path is not None:
             self.combined_data_csv_relative_path = Path(self.combined_data_csv_relative_path)
         if self.parameters_relative_path is not None:

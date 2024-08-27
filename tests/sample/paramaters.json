@@ -1,0 +1,12 @@
+{
+    "description": "",
+    "power_meter_data_relative_path": null,
+    "px6_data_relative_path": null,
+    "hwctrl_log_data_relative_path": null,
+    "combined_data_csv_relative_path": null,
+    "parameters_relative_path": null,
+    "pointing_data_source": "hwctrl",
+    "analysis_results": {
+        "elevation_columns": null
+    }
+}
