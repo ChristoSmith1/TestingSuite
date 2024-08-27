@@ -281,4 +281,4 @@ if __name__ == "__main__":
     # meta_data.analysis_results.elevation_columns = [IndexInterval(0, 200)]
     # meta_data.write_parameters()
 
-    # TestInfo.init(R"tests\sample")
+    TestInfo.init(R"tests\sample")
