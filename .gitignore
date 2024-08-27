@@ -1,5 +1,5 @@
 Outputs_Not_Tracked_in_Git/
 
 /**/.venv/
-
+/**/.vscode/
 /**/__pycache__/
