@@ -285,3 +285,5 @@ if __name__ == "__main__":
 
     info = TestInfo.load("tests/2024-03-26")
     logger.info(info.data)
+    info = TestInfo.load("tests/2024-04-22")
+    logger.info(info.data)
