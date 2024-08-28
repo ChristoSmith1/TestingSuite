@@ -54,7 +54,7 @@ class TestInfo:
             self.px6_data_relative_path = Path(self.px6_data_relative_path)
         if self.hwctrl_log_data_relative_path is not None:
             self.hwctrl_log_data_relative_path = Path(self.hwctrl_log_data_relative_path)
-            self.combined_data_csv_relative_path = Path("./analysis_data.csv")
+            self.combined_data_csv_relative_path = Path("./analysis_data/data.csv")
         if self.combined_data_csv_relative_path is not None:
             self.combined_data_csv_relative_path = Path(self.combined_data_csv_relative_path)
         if self.parameters_relative_path is not None:
@@ -274,11 +274,14 @@ class TestInfo:
 
 if __name__ == "__main__":
     # logger.setLevel("INFO")
-    meta_data = TestInfo.load(R"tests\2024-04-22")
+    # meta_data = TestInfo.load(R"tests\2024-04-22")
     # logger.info(f"{meta_data=}")
-    logger.info(f"{meta_data.data}")
+    # logger.info(f"{meta_data.data}")
     # meta_data._create_combined_data()
     # meta_data.analysis_results.elevation_columns = [IndexInterval(0, 200)]
     # meta_data.write_parameters()
 
-    TestInfo.init(R"tests\sample")
+    # TestInfo.init(R"tests\sample")
+
+    info = TestInfo.load("tests/2024-03-26")
+    logger.info(info.data)
