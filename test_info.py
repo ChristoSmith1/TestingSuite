@@ -271,10 +271,10 @@ class TestInfo:
             logger.debug(f"Loaded metadata for test folder '{rv.test_folder_path}'")
             return rv
 
-march_info = TestInfo("tests/2024-03-26")
-"""Test from APRIL 2024"""
+march_info = TestInfo.load("tests/2024-03-26")
+"""Test from MARCH 2024"""
 
-april_info = TestInfo("tests/2024-04-22")
+april_info = TestInfo.load("tests/2024-04-22")
 """Test from APRIL 2024"""
 
 if __name__ == "__main__":
