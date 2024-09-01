@@ -6,7 +6,7 @@ from typing import Any, Literal, NamedTuple
 
 import pandas as pd
 
-from util.simple_log import logger
+from govert.util.simple_log import logger
 import g_over_t
 
 class IndexInterval(NamedTuple):
