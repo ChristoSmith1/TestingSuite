@@ -75,7 +75,7 @@ if __name__ == "__main__":
             "timestamp_dt",
             "elevation",
             "azimuth",
-        ]
+        ],
     )
 
     # print(pointing_interpolator)

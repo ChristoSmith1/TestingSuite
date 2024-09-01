@@ -1,5 +1,5 @@
 import pyvisa
-from time import time
+# from time import time
 from time import sleep
 import time
 from datetime import datetime

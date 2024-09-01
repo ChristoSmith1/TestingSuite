@@ -19,7 +19,9 @@ specan = test.open_resource("GPIB2::18::INSTR")
 def measurePower():
     powmetmeas = []
     for i in range(50):
-        power = float(powmet.query("FETC:POW:AC?"))
+
+        # MAYO: The below line refers to `powmet`, which does not exist
+        power = float(powmet.query("FETC:POW:AC?"))  # noqa: F821
         powmetmeas.append(power)
         print(power)
         time.sleep(0.1)

@@ -6,12 +6,18 @@ dependencies = [
   "matplotlib>=3.8.3",
   "pandas>=2.2.1",
   "rich>=13.7.1",
-  "pydantic>=2.8.2"
+  "pydantic>=2.8.2",
+  "pyvisa"
 ]
 
 [project.optional-dependencies]
 dev = [
     "ruff>=0.6.3",
+]
+
+[tool.ruff.format]
+exclude = [
+    "*.ipynb",
 ]
 
 [tool.ruff.lint]
@@ -20,6 +26,7 @@ ignore = [
     "F401", # unused-import
     "B007", # unused-loop-control-variable
     "F841", # unused-variable
+    "PD901",    # pandas-df-variable-name
 ]
 extend-select = [
     "B",        # flake8-bugbear
@@ -32,5 +39,7 @@ extend-select = [
     "NPY",      # NumPy-specific rules  # EXPERIMENTING WITH THIS
 ]
 exclude = [
-    "MayoKernel.py",    # This file should be deleted
+    "MayoKernel.py",    # This file should be deleted,
+    "Automation Code\\SpecAn_SigGen_PowMet.py", # This file should be deleted,
+    "*.ipynb",
 ]

@@ -1,5 +1,4 @@
 import pyvisa
-from time import time
 from time import sleep
 import time
 from datetime import datetime
@@ -59,7 +58,9 @@ for i in range(number_of_readings):
     MarkF=(SpecAn.query('MKF?'))
     SpecPow=(SpecAn.query('MKA?'))
     sleep(pause_between_readings)
-    print((str(datetime.utcnow()),meter,MarkF,SpecPow,frq))
+
+    # MAYO: The line below refers to `meter`, which is not defined anywhere.
+    print((str(datetime.utcnow()),meter,MarkF,SpecPow,frq))  # noqa: F821
 #print(SigGen.query("P084500000Z0K3L0M0N6O1"))
 
 ##########POWER METER####################

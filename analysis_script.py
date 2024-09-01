@@ -80,8 +80,8 @@ if __name__ == "__main__":
                 print(f"    max: {column_max}")
                 print(f"    (max - min): {column_max - column_min}")
                 print(f"    (last - first): {column_data[-1] - column_data[0]}")
-            except:
-                print(f"    Unable to do calculations on this column.")
+            except Exception as exc:
+                print(f"    Unable to do calculations on this column. {exc}")
                 pass
 
 
@@ -154,8 +154,8 @@ if __name__ == "__main__":
             timestamp: datetime.datetime = first_row_data["timestamp"]
             timezone = timestamp.tzinfo
             print(f"timezone={timezone!r}  [{type(timezone)!r}]")
-        except:
-            print(f"Unable to find a `datetime.datetime` object")
+        except Exception as exc:
+            print(f"Unable to find a `datetime.datetime` object. {exc}")
 
 
     print(f'***** Time zone attribute of "timestamp" values [before fix] *****')

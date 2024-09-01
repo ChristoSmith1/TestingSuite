@@ -1,6 +1,6 @@
 import pyvisa
-from time import time
-from time import sleep
+# from time import time
+# from time import sleep
 import time
 from datetime import datetime
 import matplotlib.pyplot as plt

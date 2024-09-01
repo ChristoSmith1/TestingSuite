@@ -29,7 +29,7 @@ regex_pattern = re.compile(
     + r"(?P<commanded_azimuth>\d+\.?\d*),\s*"
     + r"(?P<commanded_elevation>\d+\.?\d*),"
     + r".*$",
-    flags=re.MULTILINE
+    flags=re.MULTILINE,
 )
 
 # print(f"Regex pattern string is:\n{regex_pattern.pattern!r}")
@@ -46,7 +46,7 @@ def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime.datetime | float
             month=1,
             day=1,
         ) + datetime.timedelta(
-            days = int(groupdict["day"]) - 1
+            days = int(groupdict["day"]) - 1,
         )
         time = datetime.time.fromisoformat(groupdict["time"])
         timestamp = datetime.datetime.combine(date_dt.date(), time, tzinfo=datetime.UTC)

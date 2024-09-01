@@ -31,10 +31,9 @@ else:
     _console_handler = logging.StreamHandler()
     _console_handler.setLevel(logging.DEBUG)
 
-_console_format
 _console_handler.setFormatter(logging.Formatter(
     fmt=_console_format,
-    datefmt="%X"
+    datefmt="%X",
 ))
 
 

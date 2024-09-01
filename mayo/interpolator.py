@@ -28,7 +28,7 @@ class LinearSpline(_FloatInterpolator):
         self,
         x: Sequence[float],
         y: Sequence[float],
-        extrapolate: bool = False
+        extrapolate: bool = False,
     ) -> None:
         self.x = list(x)
         self.y = list(y)
@@ -36,7 +36,7 @@ class LinearSpline(_FloatInterpolator):
         self.max_x = max(self.x)
         self.extrapolate = extrapolate
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)  # noqa: B019
     def __call__(self, x: float) -> float:
         if (
             (x < self.min_x or x > self.max_x)
@@ -57,7 +57,7 @@ class Interpolator:
         x_key: str,
         *,
         method: Literal["linear", "cubic", "pchip"] = "linear",
-        extrapolate: bool = False
+        extrapolate: bool = False,
     ) -> None:
         self.x_key = x_key
         self.data = data
@@ -152,21 +152,21 @@ if __name__ == "__main__":
     interpolator_linear = Interpolator(
         data=data,
         x_key="time",
-        method="linear"
+        method="linear",
     )
     print(interpolator_linear)
 
     interpolator_cubic = Interpolator(
         data=data,
         x_key="time",
-        method="cubic"
+        method="cubic",
     )
     print(interpolator_cubic)
 
     interpolator_pchip = Interpolator(
         data=data,
         x_key="time",
-        method="pchip"
+        method="pchip",
     )
     print(interpolator_pchip)
 

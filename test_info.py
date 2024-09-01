@@ -130,7 +130,7 @@ class TestInfo:
         merge_start_time = time.monotonic()
         combined_data = g_over_t.combine_power_position(
             power_data=power_data,
-            position_data=position_data
+            position_data=position_data,
         )
         merge_time = time.monotonic() - merge_start_time
         logger.info(f"Finished data merge in {merge_time:.3f} seconds. {len(combined_data):,} data points in combined.")

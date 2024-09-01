@@ -12,14 +12,14 @@ POWER_METER_CSV_PATH_2 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_2.cs
 POWER_METER_CSV_PATH_3 = "merge_test\MSU_PowerMeter_GoverT_06022024_XXXXUTC_3.csv"
 
 
-def parse_time(year: int, days: int, time: str,) -> datetime:
+def parse_time(year: int, days: int, time_str: str,) -> datetime:
     """convert time and date to datetime object"""
     jan_1 = datetime(year,1,1)
     delta_after_jan1 = timedelta(days-1)
     date_in_px6 = jan_1 + delta_after_jan1
     # print(f"{jan_1} {delta_after_jan1} {date_in_px6}")
 
-    utc_time = datetime.strptime(time, "%H:%M:%S.%f").replace(year=date_in_px6.year, month=date_in_px6.month, day=date_in_px6.day)
+    utc_time = datetime.strptime(time_str, "%H:%M:%S.%f").replace(year=date_in_px6.year, month=date_in_px6.month, day=date_in_px6.day)
     return utc_time 
     pass
 

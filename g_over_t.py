@@ -167,7 +167,7 @@ class LinearSpline(_FloatInterpolator):
         self,
         x: Sequence[float],
         y: Sequence[float],
-        extrapolate: bool = False
+        extrapolate: bool = False,
     ) -> None:
         self.x = list(x)
         self.y = list(y)
@@ -175,7 +175,7 @@ class LinearSpline(_FloatInterpolator):
         self.max_x = max(self.x)
         self.extrapolate = extrapolate
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)  # noqa: B019
     def __call__(self, x: float) -> float:
         if (
             (x < self.min_x or x > self.max_x)
@@ -196,7 +196,7 @@ class Interpolator:
         x_key: str,
         *,
         method: Literal["linear", "cubic", "pchip"] = "linear",
-        extrapolate: bool = False
+        extrapolate: bool = False,
     ) -> None:
         self.x_key = x_key
         self.data = data
@@ -328,7 +328,7 @@ _hwctrl_regex_pattern = re.compile(
     + r"(?P<commanded_azimuth>\d+\.?\d*),\s*"
     + r"(?P<commanded_elevation>\d+\.?\d*),"
     + r".*$",
-    flags=re.MULTILINE
+    flags=re.MULTILINE,
 )
 
 # print(f"Regex pattern string is:\n{regex_pattern.pattern!r}")
@@ -360,7 +360,7 @@ def parse_hwctrl_log_text(text: str) -> list[dict[str, datetime | float]]:
             month=1,
             day=1,
         ) + timedelta(
-            days = int(groupdict["day"]) - 1
+            days = int(groupdict["day"]) - 1,
         )
         time_hwctrl = time.fromisoformat(groupdict["time"])
         timestamp = datetime.combine(date_dt.date(), time_hwctrl, tzinfo=UTC)
