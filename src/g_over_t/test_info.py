@@ -9,6 +9,11 @@ import pandas as pd
 from src.g_over_t.util.simple_log import logger
 import g_over_t as g_over_t
 
+
+TESTS_ROOT_PATH = (Path(__file__).parent.parent.parent / "tests").expanduser().resolve()
+"""The root path that has all the test stuff"""
+
+
 class IndexInterval(NamedTuple):
     """Interval of indexes, INCLUSIVE"""
     start: int
@@ -79,7 +84,7 @@ class TestInfo:
     def data(self, value: pd.DataFrame) -> None:
         self._data = value
 
-    def _get_power_data(self) -> list[dict[str, Any]]:
+    def get_power_data(self) -> list[dict[str, Any]]:
         """Get power data as a `list[dict[str, Any]]`"""
         power_meter_path = self.test_folder_path / self.power_meter_data_relative_path
         if not power_meter_path:
@@ -92,7 +97,7 @@ class TestInfo:
         logger.debug(f"Reading power data from {power_meter_path}")        
         return g_over_t.read_power_file(power_meter_path)
 
-    def _get_pointing_data(self) -> list[dict[str, Any]]:
+    def get_pointing_data(self) -> list[dict[str, Any]]:
         """Get pointing data as a `list[dict[str, Any]]`"""
         if self.pointing_data_source == "px6":
             path = self.test_folder_path / self.px6_data_relative_path
@@ -120,10 +125,10 @@ class TestInfo:
         logger.debug(f"Building data set from raw files")
         self._data = None
 
-        power_data = self._get_power_data()
+        power_data = self.get_power_data()
         logger.debug(f"Read {len(power_data):,} power datapoints from {power_data[0]['timestamp']} to {power_data[-1]['timestamp']}")
 
-        position_data = self._get_pointing_data()
+        position_data = self.get_pointing_data()
         logger.debug(f"Loaded pointing data. {len(position_data):,} data points from {position_data[0]['timestamp']} to {position_data[-1]['timestamp']}")
 
         logger.info(f"Beginning data merge. Might take awhile, might not.")
@@ -182,7 +187,7 @@ class TestInfo:
         logger.info(f"Creating empty json in folder {path}")
         path.mkdir(parents=True, exist_ok=True)
         info = TestInfo()
-        info.write_parameters(path / "paramaters.json")
+        info.write_parameters(path / "parameters.json")
         raw_data_folder_path = path / "raw_data"
         raw_data_folder_path.mkdir(parents=True, exist_ok=True)
 
@@ -276,6 +281,8 @@ march_info = TestInfo.load("tests/2024-03-26")
 
 april_info = TestInfo.load("tests/2024-04-22")
 """Test from APRIL 2024"""
+
+
 
 if __name__ == "__main__":
     # logger.setLevel("INFO")

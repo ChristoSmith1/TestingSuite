@@ -45,7 +45,8 @@ logger = logging.getLogger("simple_log")
 >>> logger.info("This is an informational level message")
 21:40:55 INFO     This is an informational level message
 """
-logger.addHandler(_console_handler)
+if not logger.handlers:
+    logger.addHandler(_console_handler)
 
 def set_level(level: int | str) -> None:
     logger.setLevel(level)
