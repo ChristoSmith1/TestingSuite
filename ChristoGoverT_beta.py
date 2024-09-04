@@ -87,7 +87,7 @@ pause_between_readings = float(input("How long do you want to pause between read
 filenumber = input("Input file number (1,2,etc.): ")
 
 #opens a titles a CSV, should be in format Power_Reading_DISHNAME_Date.csv
-file_name = "MSU_PowerMeter_GoverT_" + str(datetime.utcnow().isoformat(timespec="minutes")) + filenumber + ".csv"
+file_name = "data/MSU_PowerMeter_GoverT_" + str(datetime.utcnow().isoformat(timespec="minutes")) + filenumber + ".csv"
 file_name = file_name.replace(":","_").replace("-","_").replace(" ","_")
 print(f"using file name: {file_name}")
 with open(file_name, "w") as file:
