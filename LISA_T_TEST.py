@@ -4,24 +4,19 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from time import sleep
 
-#GOAL, have this run on a loop wherein it creates a .csv of a SpecAn reading at a single instant with frequencies and powers
-#then have it create a visual trace in the plotting portion and save it as "Mission_DateTime_TracePlot_#.png" or whatever the standard 
-#output of python is. Then do that again 1 minute later whether a plot that is showing has been closed or not
+test = pyvisa.ResourceManager()
 
-specan = pyvisa.ResourceManager()
-
-for i, v in enumerate(list(specan.list_resources())):
+for i, v in enumerate(list(test.list_resources())):
     print(f"[{i+1}] {v}")
 while True:
     try:
         # device = list(test.list_resources())[int(input("Device Num: "))-1]
-        device = list(specan.list_resources())[4]
+        device = list(test.list_resources())[4]
         break
     except ValueError:
         print("Please input an integer")
 
-DUT = specan.open_resource(device)
-#DUT = Device Under Test
+DUT = test.open_resource(device)
 
 # CF = DUT.write("CF=22680000")
 units = str(DUT.query("AUNITS?")).strip()
