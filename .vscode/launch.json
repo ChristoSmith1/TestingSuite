@@ -11,9 +11,12 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "env": {
-                "PYTHONPATH": "${cwd}"
-            }
+            // "env": {
+            //     "PYTHONPATH": "${cwd}:${cwd}/whatever"
+            //     // "PYTHONPATH": "${cwd}"
+            // }
+            // "env": {"PYTHONPATH": "${workspaceFolder};${workspaceFolder}/src;${env:PYTHONPATH}"}
+
         }
     ]
 }

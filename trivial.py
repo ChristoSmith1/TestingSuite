@@ -1,11 +1,11 @@
 """
 Example of how to use `test_info` 
 """
-
+# C:\Users\dcmay\dev\TestingSuite\src
 import matplotlib.pyplot as plt
 
 # Import these from `test_info.py` These are INSTANCES of the `TestInfo` class
-from test_info import march_info, april_info, TestInfo
+from govert.test_info import march_info, april_info, TestInfo
 
 info = march_info
 

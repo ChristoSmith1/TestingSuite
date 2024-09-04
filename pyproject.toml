@@ -1,3 +1,21 @@
+[project]
+name = "govert"
+version = "0.1.0"
+description = "G over T tools"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "ipykernel>=6.29.4",
+    "matplotlib>=3.9.2",
+    "numpy>=1.0,<2.0",
+    "pandas>=2.2.2",
+    "pydantic>=2.8.2",
+    "pyvisa>=1.14.1",
+    "rich>=13.8.0",
+    "ruff>=0.6.3",
+    "scipy>=1.12.0",
+]
+
 [tool.ruff.lint]
 ignore = [
     "F541"
