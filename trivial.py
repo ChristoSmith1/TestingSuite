@@ -5,7 +5,7 @@ Example of how to use `test_info`
 import matplotlib.pyplot as plt
 
 # Import these from `test_info.py` These are INSTANCES of the `TestInfo` class
-from govert.test_info import march_info, april_info, TestInfo
+from g_over_t.test_info import march_info, april_info, TestInfo
 
 info = march_info
 

@@ -1,3 +1,5 @@
+# This file was previously called `g_over_t.py`
+
 import csv
 from datetime import UTC, datetime, timedelta, time, timezone
 import functools
@@ -14,7 +16,6 @@ def hello_world(message: str):
     print (f"Hello {message}")
 
 # FILTER OUT THE NANS
-# This should also go in `g_over_t`
 def filter_out_nan(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Create a copy of the data, but any row that has any NaN value (for any key) will be thrown out"""
     data_copy = data.copy()

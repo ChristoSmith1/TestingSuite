@@ -11,7 +11,7 @@ import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
 
-import g_over_t
+import g_over_t as g_over_t
 
 # from scipy.interpolate import BSpline
 # from scipy.interpolate import make_interp_spline

@@ -2,7 +2,7 @@
 
 # helloworld("christo")
 
-import g_over_t
+import g_over_t as g_over_t
 import matplotlib.pyplot as plt
 import numpy as np
 
