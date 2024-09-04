@@ -2,6 +2,11 @@
 Methods for merging raw data sources
 """
 
+import sys
+
+# TODO: Tidy this up
+sys.path.insert(0, R"./src/")
+
 import argparse
 from pathlib import Path
 import time

@@ -6,7 +6,7 @@ from typing import Any, Literal, NamedTuple
 
 import pandas as pd
 
-from src.g_over_t.util.simple_log import logger
+from g_over_t.util.simple_log import logger
 import g_over_t as g_over_t
 
 
