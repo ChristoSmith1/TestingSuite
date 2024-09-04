@@ -9,6 +9,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+import sys
+
+# TODO: Tidy this up
+sys.path.insert(0, R"./src/")
+
 from g_over_t.test_info import TestInfo
 
 

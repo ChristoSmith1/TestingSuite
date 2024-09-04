@@ -14,6 +14,13 @@ TESTS_ROOT_PATH = (Path(__file__).parent.parent.parent / "tests").expanduser().r
 """The root path that has all the test stuff"""
 
 
+class ElapsedInterval(NamedTuple):
+    """Interval of elapsed time, INCLUSIVE"""
+    start: float
+    end: float
+    column: str = "elapsed"
+
+
 class IndexInterval(NamedTuple):
     """Interval of indexes, INCLUSIVE"""
     start: int
