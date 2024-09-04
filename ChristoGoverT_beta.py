@@ -56,6 +56,12 @@ print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB ad
 print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
 
 ########TESTING AND CALIBRATION THAT CAN BE AUTOMATED ########
+# cal_factor = input("what is the CF percentage for your IF input?")
+# message = 'RCF 98.7PCT'
+# print(f"About to write {message}")
+# response = power_meter.write(message)
+# print(f"Received response: {response}")
+# exit()
 print(power_meter.write('CAL')) #this calibrates the insturment
 sleep(18)
 print(power_meter.write('ZE')) #this zeroe's the insturment
