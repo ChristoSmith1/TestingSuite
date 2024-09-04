@@ -2,6 +2,7 @@
 Methods for merging raw data sources
 """
 
+import argparse
 from pathlib import Path
 import time
 import g_over_t
@@ -65,6 +66,7 @@ def merge(test_info: TestInfo) -> None:
 
 
 def _select_path(path: str | None) -> Path:
+    """Select the path of the test info"""
     if path:
         return Path(path).expanduser().resolve()
     
@@ -80,9 +82,9 @@ def _select_path(path: str | None) -> Path:
     return TESTS_ROOT_PATH / choice
 
 def main():
-    import argparse
-
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Script to merge power and pointing data"
+    )
     parser.add_argument(
         "path",
         nargs="?",
