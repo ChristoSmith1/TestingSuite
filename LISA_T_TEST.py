@@ -52,7 +52,7 @@ DUT = choose_device()
 
 # DUT = test.open_resource(device)
 
-CF = write_to_resource(DUT,"CF=22680000")
+CF = write_to_resource(DUT,"CF 287000000")
 units = str(query_resource(DUT,"AUNITS?")).strip()
 stFreq = float(query_resource(DUT,"FA?"))
 enFreq = float(query_resource(DUT,"FB?"))
@@ -70,7 +70,7 @@ markerPow = float(DUT.query("MKA?"))
 print(f"CF:     {markerFreq}")
 print(f"CF POW: {markerPow}")
 
-number_of_iterations = 10
+number_of_iterations = 1000
 """number of times loop is run"""
 
 plt.plot(frequencies, traceData)
