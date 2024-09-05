@@ -4,7 +4,7 @@
     "px6_data_relative_path": "raw_data\\GTprocedure20240421.txt",
     "hwctrl_log_data_relative_path": "raw_data\\govert.020.D249T15-47-05",
     "combined_data_csv_relative_path": "analysis_data\\data.csv",
-    "parameters_relative_path": "tests\\2024-09-05\\parameters.json",
+    "parameters_relative_path": "tests\\2024-09-05-2\\parameters.json",
     "pointing_data_source": "hwctrl",
     "analysis_results": {
         "elevation_columns": null
