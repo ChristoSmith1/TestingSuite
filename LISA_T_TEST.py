@@ -70,7 +70,8 @@ markerPow = float(DUT.query("MKA?"))
 print(f"CF:     {markerFreq}")
 print(f"CF POW: {markerPow}")
 
-timed = 10
+number_of_iterations = 10
+"""number of times loop is run"""
 
 plt.plot(frequencies, traceData)
 plt.xlabel("Frequency [Hz]")
@@ -115,7 +116,7 @@ def save_plot_and_csv(index: int) -> None:
 timeStamp = datetime.now().timestamp()
 with open(f"LISA_T_TEST2.csv", "w") as file:
     file.write("Datetime [UTC],  Center Freq [Hz], Marker Freq [Hz], Marker Power [dBm]\n")
-    for index in range (timed):
+    for index in range (number_of_iterations):
         peak = float(DUT.write("MKPK"))
         center = float(DUT.query("CF?"))
         markerFreq = float(DUT.query("MKF?"))
