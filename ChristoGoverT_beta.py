@@ -63,15 +63,15 @@ if __name__ == "__main__":
     # response = power_meter.write(message)
     # print(f"Received response: {response}")
     # exit()
-    print(power_meter.write('CAL')) #this calibrates the insturment
-    sleep(18)
-    print(power_meter.write('ZE')) #this zeroe's the insturment
-    sleep(10)
+    # print(power_meter.write('CAL')) #this calibrates the insturment
+    # sleep(18)
+    # print(power_meter.write('ZE')) #this zeroe's the insturment
+    # sleep(10)
     power_meter.write('*TST?') # This makes the machine conduct a self test before beginning
     sleep(10)
     #the sleep cycles in the machine cal process above are their because while they are running, if I attempt to read out power it will crash
 
-    print(power_meter.query('*OPC?')) #this is the SCIP protocol for telling me operations are completed, currently prints "+5" implying syntax error
+    # print(power_meter.query('*OPC?')) #this is the SCIP protocol for telling me operations are completed, currently prints "+5" implying syntax error
     sleep(1)
     input("Press Enter to continue...")
 
