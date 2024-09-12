@@ -16,9 +16,38 @@ TESTS_ROOT_PATH = (Path(__file__).parent.parent.parent / "tests").expanduser().r
 
 class ElapsedInterval(NamedTuple):
     """Interval of elapsed time, INCLUSIVE"""
+    
     start: float
     end: float
     column: str = "elapsed"
+
+    def __contains__(self, key: float) -> bool:
+        return self.start <= key <= self.end
+    
+    def __str__(self) -> str:
+        return f"[{self.start}, {self.end}]"
+    
+    def __repr__(self) -> str:
+        return f"[{self.start}, {self.end}]"
+
+    def overlaps(self, other: "ElapsedInterval") -> bool:
+        return (
+            self.start in other
+            or self.end in other
+            or other.start in self
+            or other.end in self
+        )
+    
+    def union(self, other: "ElapsedInterval") -> "ElapsedInterval":
+        if not self.overlaps(other):
+            raise ValueError(f"{self} and {other} can't be unioned because they don't overlap")
+        if self.column != other.column:
+            raise ValueError(f"{self} and {other} can't be unioned because they have different column names")
+        return ElapsedInterval(
+            start=min(self.start, other.start),
+            end=min(self.end, other.end),
+            column=self.column,
+        )
 
 
 class IndexInterval(NamedTuple):
@@ -289,7 +318,11 @@ march_info = TestInfo.load("tests/2024-03-26")
 april_info = TestInfo.load("tests/2024-04-22")
 """Test from APRIL 2024"""
 
+sept_info = TestInfo.load("tests/2024-09-05")
+"""Test 1 from September 2024"""
 
+sept_info2 = TestInfo.load("tests/2024-09-05-2")
+"""Test 2 from September 2024"""
 
 if __name__ == "__main__":
     # logger.setLevel("INFO")

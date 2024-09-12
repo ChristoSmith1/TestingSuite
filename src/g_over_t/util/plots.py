@@ -128,7 +128,8 @@ def plot_all(
 def plot_all_test_info(
     test_info: TestInfo,
     *,
-    highlights: Collection[HighlightInterval] | None = None
+    highlights: Collection[HighlightInterval] | None = None,
+    show: bool = False
 ) -> tuple[plt.Figure, list[plt.Axes]]:
     fig, ax = plot_all(
         test_info.data,
@@ -138,24 +139,45 @@ def plot_all_test_info(
         highlights = highlights,
     )
     fig.suptitle(f"{test_info.description}", fontsize=20)
+    if show:
+        plt.show()
     return fig, ax
 
 
 if __name__ == "__main__":
-    from g_over_t.test_info import march_info, april_info
+    from g_over_t.test_info import march_info, april_info, sept_info, sept_info2
+    # plot_all_test_info(
+    #     sept_info,
+    #     highlights = [
+    #     #     HighlightInterval(start=1140-55, end=1140, column_name="elapsed", color="#00bb00", label="ON"),
+    #     #     HighlightInterval(start=1140+10, end=1140+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
+
+    #     #     HighlightInterval(start=1380-55, end=1380, column_name="elapsed", color="#00bb00", label="ON"),
+    #     #     HighlightInterval(start=1380+10, end=1380+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
+
+    #     #     HighlightInterval(start=1618-55, end=1618, column_name="elapsed", color="#00bb00", label="ON"),
+    #     #     HighlightInterval(start=1618+10, end=1618+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
+
+    #         HighlightInterval(start=1260, end=3230, column_name="elapsed", color="#0000ff", label="EL_COL"),
+    #     ]
+    # )
+
     plot_all_test_info(
-        april_info,
+        sept_info2,
         highlights = [
-            HighlightInterval(start=1140-55, end=1140, column_name="elapsed", color="#00bb00", label="ON"),
-            HighlightInterval(start=1140+10, end=1140+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
+        #     HighlightInterval(start=1140-55, end=1140, column_name="elapsed", color="#00bb00", label="ON"),
+        #     HighlightInterval(start=1140+10, end=1140+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
 
-            HighlightInterval(start=1380-55, end=1380, column_name="elapsed", color="#00bb00", label="ON"),
-            HighlightInterval(start=1380+10, end=1380+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
+        #     HighlightInterval(start=1380-55, end=1380, column_name="elapsed", color="#00bb00", label="ON"),
+        #     HighlightInterval(start=1380+10, end=1380+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
 
-            HighlightInterval(start=1618-55, end=1618, column_name="elapsed", color="#00bb00", label="ON"),
-            HighlightInterval(start=1618+10, end=1618+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
+        #     HighlightInterval(start=1618-55, end=1618, column_name="elapsed", color="#00bb00", label="ON"),
+        #     HighlightInterval(start=1618+10, end=1618+10+55, column_name="elapsed", color="#bb0000", label="OFF"),
 
-            HighlightInterval(start=1810, end=3840, column_name="elapsed", color="#0000ff", label="EL_COL"),
+            HighlightInterval(start=939, end=2945, column_name="elapsed", color="#0000ff", label="EL_COL_0"),
+            HighlightInterval(start=3120, end=5105, column_name="elapsed", color="#00ff00", label="EL_COL_1"),
+            HighlightInterval(start=5270, end=7260, column_name="elapsed", color="#ff0000", label="EL_COL_2"),
+            HighlightInterval(start=7420, end=9420, column_name="elapsed", color="#cccc00", label="EL_COL_4"),
         ]
     )
     # plot_all(

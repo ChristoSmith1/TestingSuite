@@ -4,14 +4,9 @@ Outputs_Not_Tracked_in_Git/
 /**/.vscode/
 /**/__pycache__/
 
-/build/
+data/
 
-#####################################
-#
-#   BELOW FROM GITHUB
-#   https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
-#
-#####################################
+# below copied from github:
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
