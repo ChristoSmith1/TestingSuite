@@ -324,6 +324,12 @@ sept_info = TestInfo.load("tests/2024-09-05")
 sept_info2 = TestInfo.load("tests/2024-09-05-2")
 """Test 2 from September 2024"""
 
+info_sept_11_1 = TestInfo.load("tests/2024-09-11_1")
+"""Test 2 from 2024-09-11 (1st test)"""
+
+info_sept_11_2 = TestInfo.load("tests/2024-09-11_2")
+"""Test 2 from 2024-09-11 (2nd test)"""
+
 if __name__ == "__main__":
     # logger.setLevel("INFO")
     # meta_data = TestInfo.load(R"tests\2024-04-22")

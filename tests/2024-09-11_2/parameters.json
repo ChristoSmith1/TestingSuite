@@ -1,0 +1,12 @@
+{
+    "description": "Test 2 from 2024-09-11 (2nd test)",
+    "power_meter_data_relative_path": "tests/2024-09-11_2/raw_data/MSU_PowerMeter_GoverT_2024_09_11T22_172.csv",
+    "px6_data_relative_path": "tests/2024-09-11_2/raw_data/GTprocedure20240911.2.txt",
+    "hwctrl_log_data_relative_path": "tests/2024-09-11_2/raw_data/govert2.176.D255T22-17-00",
+    "combined_data_csv_relative_path": "analysis_data/data.csv",
+    "parameters_relative_path": null,
+    "pointing_data_source": "hwctrl",
+    "analysis_results": {
+        "elevation_columns": null
+    }
+}
