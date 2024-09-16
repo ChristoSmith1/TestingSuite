@@ -14,7 +14,7 @@ yfactor = 5.0
 def tip_curve(info: TestInfo):
 
     t_op = Top=abs((180-(10**(yfactor/10))*10)/(10**(Yfactor/10)-1))
-    #Top=abs((135-(10**(Yfactor/10))*10)/(10**(Yfactor/10)-1)) <- 135 moon contribution at S-Band, 180 at X-band
+    # Top=abs((135-(10**(Yfactor/10))*10)/(10**(Yfactor/10)-1)) <- 135 moon contribution at S-Band, 180 at X-band
 
     # I need to get just the elevation column from sept_info which right now gets everything.
     # T_op = (135-((10**(Y-factor/10))*10))/((10**(Y-factor/10))-1) <- correct math!
