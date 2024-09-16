@@ -48,6 +48,11 @@ class ElapsedInterval(NamedTuple):
             end=min(self.end, other.end),
             column=self.column,
         )
+    
+    def subset_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Return a subset (a view) of the passed in DataFrame where the specified column
+        (usually "elapsed") is withing the endpoints (inclusive)"""
+        return df[(df[self.column] >= self.start) & (df[self.column] <= self.end)]
 
 
 class IndexInterval(NamedTuple):

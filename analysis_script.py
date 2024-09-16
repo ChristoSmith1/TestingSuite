@@ -19,13 +19,14 @@ from combined_filtered_analysis import y_factor_criteria
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
-PX6_DATA_PATH = R"april21govert\GTprocedure20240421.txt"
-HWCTRL_LOG_DATA_PATH = R"april21govert\GTAUTO.176.D113T00-27-51"
+# POWER_METER_DATA_PATH = R"april21govert\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+POWER_METER_DATA_PATH = R"april21govert/MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv"
+PX6_DATA_PATH = R"april21govert/GTprocedure20240421.txt"
+HWCTRL_LOG_DATA_PATH = R"april21govert/GTAUTO.176.D113T00-27-51"
 
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"april21govert\combined_Xband_April.csv"
-FILTERED_COMBINED_DATA_PATH = R"april21govert\combined_filtered_XBand_April.csv"
+COMBINED_DATA_PATH = R"april21govert/combined_Xband_April.csv"
+FILTERED_COMBINED_DATA_PATH = R"april21govert/combined_filtered_XBand_April.csv"
 
 
 # # INPUT DATA PATHS
@@ -325,39 +326,42 @@ if __name__ == "__main__":
     
 ##### ATTEMPTING TO FIGURE OUT FILTERING OF ELEVATION COLUMNS #####
 
-    elevation_column_1_points = [
+    min_timestamp_posix = min(g_over_t.get_column(valid_combined_data, "timestamp_posix"))
+    print(f"{min_timestamp_posix=}")
+
+    for point in valid_combined_data:
+        point["elapsed"] = point["timestamp_posix"] - min_timestamp_posix
+
+    plt.plot(
+        g_over_t.get_column(valid_combined_data, "elapsed"),
+        g_over_t.get_column(valid_combined_data, "elevation"),
+    )
+    plt.show()
+
+    elevation_column_points = [
         point
         for point
         in valid_combined_data
-        if point["azimuth"] <=(226)
+        if (
+            point["elapsed"] >= 1823
+            and point["elapsed"] <= 3820
+        )
     ]
-    elevation_column_2_points = [
-        point
-        for point
-        in elevation_column_1_points
-        if point["timestamp_posix"] >=(1711421414.8778)
-    ]
-    elevation_column_3_points = [
-        point
-        for point
-        in elevation_column_2_points
-        if point["timestamp_posix"] <=(1711422454.897903)
-    ]
-    for point in elevation_column_3_points:
-        elcolel = g_over_t.get_column(elevation_column_3_points,"elevation")
-        elcolpower = g_over_t.get_column(elevation_column_3_points,"power")
-        
+    print(f"{len(elevation_column_points) = }")
+
+    elcolel = g_over_t.get_column(elevation_column_points,"elevation")
+    elcolpower = g_over_t.get_column(elevation_column_points,"power")
 
     combined_dataframe=g_over_t.convert_to_dataframe(valid_combined_data)
     combined_dataframe=g_over_t.add_elapsed_time_column(combined_dataframe)
     print(combined_dataframe)
 
-    y_factor=y_factor_criteria(combined_dataframe, threshold_value=.2)
+    y_factor: float = y_factor_criteria(combined_dataframe, threshold_value=.2)
     print(f"{y_factor=}")
-    T_op = (150-((10**(y_factor/10))*10))/((10**(y_factor/10))-1)
+    t_op = (150 - ((10 ** (y_factor / 10)) * 10))/(( 10 ** (y_factor / 10)) - 1)
     # T_op = (180)/((10**(Yfactor/10))-1)
     # T_el = (T_op*10**((elcolpower-60.22))/10)
-    print(f"Tempetrature (Op), T_op = {T_op}")
+    print(f"Tempetrature (Op), T_op = {t_op}")
 
 #     # #####Y-FACTOR DEFINITION####
 #    Yfactor=(max(power_data_list)-min(power_data_list))
@@ -372,29 +376,36 @@ if __name__ == "__main__":
 # #then I need to plot Y=T_el, X=elevation <-next to last step
 # #overlay a line over that plot to show the T_el average <-last step
 
-    delta_cold_sky_off_moon = [-60.22]*len(elcolpower) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
-    #print(delta_cold_sky_off_moon)
-    my_array = np. array(delta_cold_sky_off_moon)
-    #print(my_array)
-    my_array2 = np. array(elcolpower)
-    #print(my_array2-my_array)
-    my_array3 = (my_array2-my_array)/10
+    def tip_curve(
+        elevation: np.ndarray[float],
+        power: np.ndarray[float],
+        cold_sky_temp: float,
+    ):
+        pass
+
+    delta_cold_sky_off_moon = np. array([-60.22]*len(elcolpower)) #designed to make a list that is the length of all elevations, but -40.52dB see line 374
+    print(f"{delta_cold_sky_off_moon=}")
+    power_array = np. array(elcolpower)
+    print(f"{power_array=}")
+    power_delta_array = (power_array-delta_cold_sky_off_moon)/10
+    print(f"{power_delta_array=}")
     # my_array4 = [50]*len(elcolpower)
     # Tel = (T_op*(10**my_array3))-my_array4
     # myarray 4 is for S-band data management.
-    Tel = (T_op*(10**my_array3))
+    t_el = (t_op * (10 ** power_delta_array))
+    print(f"{t_el=}")
 
     # ######PLOTS FOR DATA VISUALIZATION#####
     ### tip curve ###
-    plt.plot(elcolel,Tel)
-    plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, Tel, 3))(np.unique(elcolel)))
+    plt.plot(elcolel,t_el)
+    plt.plot(np.unique(elcolel), np.poly1d(np.polyfit(elcolel, t_el, 3))(np.unique(elcolel)))
     plt.grid(which='minor', color='#888888', linestyle=':', linewidth=0.5)
     plt.gca().legend(("T_elevation derived from T_op","Line of best fit"))
     plt.title('SNT vs. El at 225 degrees Az')
     plt.ylabel('SNT (in K)')
     plt.xlabel('Elevation in Degrees')
     plt.show()
-
+    exit()
 #     # ######DOME PLOT FOR TRACK#####
     # # min = min(power_data_list)
     # # print (min)
