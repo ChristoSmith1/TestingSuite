@@ -9,7 +9,9 @@ from test_info import march_info, april_info, sept_info, sept_info2, TestInfo
 from g_over_t_test import Yfactor
 
 info = sept_info
+
 yfactor = 5.0
+#import YFactor and use info to generate average Y-factor from multiple on/off measurements
 
 def tip_curve(info: TestInfo):
 
