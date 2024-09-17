@@ -113,6 +113,7 @@ class OnOffMoonPair:
             self.on = ColumnInclusiveInterval(**self.on)
         if isinstance(self.off, dict):
             self.off = ColumnInclusiveInterval(**self.off)
+ 
 
     def total_interval(self) -> ColumnInclusiveInterval:
         """Total interval of the on/off pair"""
@@ -314,6 +315,27 @@ class TestInfo:
         
         # Otherwise, create from the raw files
         self._create_combined_data()
+
+    def average_off_moon(self) -> float:
+        pass
+        total = 0
+        for pair in self.analysis_results.on_off_moon_pairs:
+            off_power_data = pair.off.subset_data_frame(self.data)["power"].mean()
+            total += off_power_data
+        average = total/len(self.analysis_results.on_off_moon_pairs)
+        return average
+
+    def y_factor(self) -> float:
+        pass
+        total = 0
+        for pair in self.analysis_results.on_off_moon_pairs:
+            on_power_data = pair.on.subset_data_frame(self.data)["power"].mean()
+            off_power_data = pair.off.subset_data_frame(self.data)["power"].mean()
+            y_factor = on_power_data-off_power_data
+            print(f"{on_power_data=}  {off_power_data=}  {y_factor=}")
+            total += y_factor
+        average = total/len(self.analysis_results.on_off_moon_pairs)
+        return average
 
     @classmethod
     def init(cls, path: Path | str) -> None:
