@@ -3,8 +3,8 @@
     "power_meter_data_relative_path": "raw_data\\MSU_PowerMeter_GoverT_2024_09_05T16_5399.csv",
     "px6_data_relative_path": "raw_data\\GTprocedure20240421.txt",
     "hwctrl_log_data_relative_path": "raw_data\\govert2.176.D249T16-57-00",
-    "combined_data_csv_relative_path": "analysis_data/data.csv",
-    "parameters_relative_path": "/home/dmayo/dev/playground/christo/tests/2024-09-05-2/parameters.json",
+    "combined_data_csv_relative_path": "analysis_data\\data.csv",
+    "parameters_relative_path": "C:\\Users\\chris\\thesis\\TestingSuite\\tests\\2024-09-05-2\\parameters.json",
     "pointing_data_source": "hwctrl",
     "analysis_results": {
         "elevation_columns": [

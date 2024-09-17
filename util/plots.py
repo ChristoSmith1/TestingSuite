@@ -85,13 +85,12 @@ def plot_one(
     ax: plt.Axes | None = None,
     fig: plt.Figure | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
-    # if (ax and not fig) or (fig and not ax):
-    #     raise ValueError(f"If passing 'fig', must also pass 'ax'")
-    # if not ax:
-    #     if not subplots_kwargs:
-    #         subplots_kwargs = {}
-    #     subplots_kwargs["layout"] = "constrained"
-    #     fig, [ax] = grid_subplots(1, **subplots_kwargs)
+    if (ax and not fig) or (fig and not ax):
+        raise ValueError(f"If passing 'fig', must also pass 'ax'")
+    if not ax:
+        subplots_kwargs = {}
+        subplots_kwargs["layout"] = "constrained"
+        fig, [ax] = grid_subplots(1, **subplots_kwargs)
 
     if interval:
         data = interval.subset_data_frame(data)

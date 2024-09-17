@@ -203,6 +203,13 @@ class TestInfo:
         self._data: pd.DataFrame | None = None
 
     @property
+    def elevation_column_data_list(self) -> list[pd.DataFrame]:
+        rv = []
+        for elevation_column in self.analysis_results.elevation_columns:
+            rv.append(elevation_column.subset_data_frame(self.data))
+        return rv 
+
+    @property
     def data(self) -> pd.DataFrame:
         if self._data is None:
             self._load_data()

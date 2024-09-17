@@ -1,10 +1,10 @@
 {
     "description": "2024-09-11 test #2",
-    "power_meter_data_relative_path": "raw_data/MSU_PowerMeter_GoverT_2024_09_11T22_172.csv",
-    "px6_data_relative_path": "raw_data/GTprocedure20240911.2.txt",
-    "hwctrl_log_data_relative_path": "raw_data/govert2.176.D255T22-17-00",
-    "combined_data_csv_relative_path": "analysis_data/data.csv",
-    "parameters_relative_path": "/home/dmayo/dev/playground/christo/tests/2024-09-11-2/parameters.json",
+    "power_meter_data_relative_path": "raw_data\\MSU_PowerMeter_GoverT_2024_09_11T22_172.csv",
+    "px6_data_relative_path": "raw_data\\GTprocedure20240911.2.txt",
+    "hwctrl_log_data_relative_path": "raw_data\\govert2.176.D255T22-17-00",
+    "combined_data_csv_relative_path": "analysis_data\\data.csv",
+    "parameters_relative_path": "C:\\Users\\chris\\thesis\\TestingSuite\\tests\\2024-09-11-2\\parameters.json",
     "pointing_data_source": "hwctrl",
     "analysis_results": {
         "elevation_columns": [
@@ -44,8 +44,8 @@
             },
             {
                 "on": {
-                    "start": 241.70368003845212,
-                    "end": 241.70368003845212,
+                    "start": 241.70368003845215,
+                    "end": 241.70368003845215,
                     "name": "elapsed"
                 },
                 "off": {
