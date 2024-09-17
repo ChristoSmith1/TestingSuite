@@ -1,33 +1,166 @@
 import dataclasses
+import functools
 import json
 from pathlib import Path
 import time
-from typing import Any, Literal, NamedTuple
+from typing import Any, Generator, Literal, NamedTuple
 
 import pandas as pd
 
+from util import simple_log
 from util.simple_log import logger
 import g_over_t
 
-class IndexInterval(NamedTuple):
-    """Interval of indexes, INCLUSIVE"""
-    start: int
-    end: int
+# class IndexInterval(NamedTuple):
+#     """Interval of indexes, INCLUSIVE"""
+#     start: int
+#     end: int
 
+
+ROOT_TESTS_PATH = Path(__file__).parent
+
+
+@functools.total_ordering
+@dataclasses.dataclass
+class ColumnInclusiveInterval:
+    """An arbitrary inclusive interval, usually to be applied
+    to a specific column of a `pd.DataFrame`, usually the "elapsed" column."""
+    start: float
+    end: float
+    name: str = "elapsed"
+
+    def __iter__(self):
+        return iter((self.start, self.end))
+    
+    def __lt__(self, other: "ColumnInclusiveInterval") -> bool:
+        if isinstance(other, ColumnInclusiveInterval):
+            return tuple(self) < tuple(other)
+        return NotImplemented
+    
+    def __eq__(self, other: "ColumnInclusiveInterval") -> bool:
+        if isinstance(other, ColumnInclusiveInterval):
+            return tuple(self) == tuple(other)
+        return NotImplemented
+
+    @classmethod
+    def from_dict(cls, dict_: dict[str, Any]) -> "ColumnInclusiveInterval":
+        return ColumnInclusiveInterval(**dict_)
+    
+    @classmethod
+    def to_dict(self) -> dict[str, Any]:
+        return dataclasses.asdict(self)
+
+    def __str__(self) -> str:
+        return f"{self.name!r} in [{self.start}, {self.end}]"
+    
+    def __contains__(self, value: float) -> bool:
+        return self.start <= value <= self.end
+    
+    def permissive_union(self, other: "ColumnInclusiveInterval") -> "ColumnInclusiveInterval":
+        """Allows union of non-overlapping intervals. So `[10, 20]` and `[30, 40]` will give `[10, 40]`"""
+        assert self.name == other.name
+        return ColumnInclusiveInterval(
+            start = min(self.start, other.start),
+            end = max(self.end, other.end),
+            name = self.name
+        )
+
+    def strict_union(self, other: "ColumnInclusiveInterval") -> "ColumnInclusiveInterval":
+        assert self.overlaps(other)
+        assert self.name == other.name
+        return ColumnInclusiveInterval(
+            start = min(self.start, other.start),
+            end = max(self.end, other.end),
+            name = self.name
+        )
+    
+    def intersect(self, other: "ColumnInclusiveInterval") -> "ColumnInclusiveInterval":
+        assert self.overlaps(other)
+        assert self.name == other.name
+        return ColumnInclusiveInterval(
+            start = max(self.start, other.start),
+            end = min(self.end, other.end),
+            name = self.name
+        )
+
+    def overlaps(self, other: "ColumnInclusiveInterval") -> None:
+        """Determine if two intervals overlap"""
+        return (
+            self.start in other
+            or self.end in other
+            or other.start in self
+            or other.end in self
+        )
+
+    def subset_data_frame(self, data: pd.DataFrame) -> pd.DataFrame:
+        """Return a subset (a view) of the given data frame where `start <= data[name] <= end`"""
+        assert self.name in data.columns
+        return data[
+            (data[self.name] >= self.start)
+            & (data[self.name] <= self.end)
+        ]
+
+
+@functools.total_ordering
+@dataclasses.dataclass
+class OnOffMoonPair:
+    """A pair of intervals representing a single on/off observation"""
+    on: ColumnInclusiveInterval
+    off: ColumnInclusiveInterval
+
+    def __post_init__(self) -> None:
+        if isinstance(self.on, dict):
+            self.on = ColumnInclusiveInterval(**self.on)
+        if isinstance(self.off, dict):
+            self.off = ColumnInclusiveInterval(**self.off)
+
+    def total_interval(self) -> ColumnInclusiveInterval:
+        """Total interval of the on/off pair"""
+        return self.on.permissive_union(self.off)
+
+    def __iter__(self):
+        return iter((self.on, self.off))
+
+    def __lt__(self, other: "OnOffMoonPair") -> bool:
+        if isinstance(other, OnOffMoonPair):
+            return tuple(self) < tuple(other)
+        return NotImplemented
+
+    def __eq__(self, other: "OnOffMoonPair") -> bool:
+        if isinstance(other, OnOffMoonPair):
+            return tuple(self) == tuple(other)
+        return NotImplemented
 
 @dataclasses.dataclass
 class AnalysisResults:
-    elevation_columns: list[IndexInterval] | None = dataclasses.field(default=None, repr=False)
+    elevation_columns: list[ColumnInclusiveInterval] | None = dataclasses.field(default=None)
+    """Identified elevation columns"""
 
-    def find_elevation_columns(self):
-        pass
+    on_off_moon_pairs: list[OnOffMoonPair] | None = dataclasses.field(default=None)
+    """Identified pairs"""
+
+    def elevation_column_interval(self) -> ColumnInclusiveInterval | None:
+        """Total interval of all elevation columns"""
+        if not self.elevation_columns:
+            return None
+        rv = self.elevation_columns[0]
+        for column in self.elevation_columns[1 : ]:
+            rv = rv.permissive_union(column)
+        return rv
 
     def __post_init__(self) -> None:
-        if self.elevation_columns is not None:
+        if self.elevation_columns and isinstance(self.elevation_columns[0], dict):
             self.elevation_columns = [
-                IndexInterval(*tup)
-                for tup
+                ColumnInclusiveInterval(**dict_)
+                for dict_
                 in self.elevation_columns
+            ]
+
+        if self.on_off_moon_pairs and isinstance(self.on_off_moon_pairs[0], dict):
+            self.on_off_moon_pairs = [
+                OnOffMoonPair(**dict_)
+                for dict_
+                in self.on_off_moon_pairs
             ]
     
 
@@ -68,7 +201,7 @@ class TestInfo:
         self.pointing_data_source = str(self.pointing_data_source).strip().casefold()
 
         self._data: pd.DataFrame | None = None
-    
+
     @property
     def data(self) -> pd.DataFrame:
         if self._data is None:
@@ -182,7 +315,7 @@ class TestInfo:
         logger.info(f"Creating empty json in folder {path}")
         path.mkdir(parents=True, exist_ok=True)
         info = TestInfo()
-        info.write_parameters(path / "paramaters.json")
+        info.write_parameters(path / "parameters.json")
         raw_data_folder_path = path / "raw_data"
         raw_data_folder_path.mkdir(parents=True, exist_ok=True)
 
@@ -237,6 +370,13 @@ class TestInfo:
         else:
             return None
 
+    @property
+    def figures_path(self) -> Path | None:
+        """Path to the "figures" folder. Will be `{test_folder_path}/figures/` """
+        if self.test_folder_path:
+            return self.test_folder_path / "figures"
+        else:
+            return None
 
     def write_parameters(self, path: Path | str | None = None) -> None:
         path = path or self.parameters_relative_path
@@ -283,6 +423,17 @@ sept_info = TestInfo.load("tests/2024-09-05")
 sept_info2 = TestInfo.load("tests/2024-09-05-2")
 """Test 2 from September 2024"""
 
+
+def all_test_paths() -> list[Path]:
+    """"""
+    return sorted(ROOT_TESTS_PATH.rglob("parameters.json"))
+
+
+def all_tests() -> Generator[TestInfo, None, None]:
+    for path in all_test_paths():
+        yield TestInfo.load(path)
+
+
 if __name__ == "__main__":
     # logger.setLevel("INFO")
     # meta_data = TestInfo.load(R"tests\2024-04-22")
@@ -294,7 +445,38 @@ if __name__ == "__main__":
 
     # TestInfo.init(R"tests\sample")
 
-    info = TestInfo.load("tests/2024-03-26")
+    info = TestInfo.load("tests/2024-09-05-2")
     logger.info(info.data)
-    info = TestInfo.load("tests/2024-04-22")
-    logger.info(info.data)
+
+    d = dataclasses.asdict(info)
+
+    from rich.pretty import pprint
+
+    pprint(d)
+    
+    print(info.analysis_results.on_off_moon_pairs)
+
+    pair = OnOffMoonPair(
+        on=ColumnInclusiveInterval(100, 200),
+        off=ColumnInclusiveInterval(250, 350),
+    )
+    pair2 = OnOffMoonPair(**{'on': {'start': 100, 'end': 200, 'name': 'elapsed'}, 'off': {'start': 250, 'end': 350, 'name': 'elapsed'}})
+    print(f"{pair=}")
+    print(f"{pair2=}")
+    print(dataclasses.asdict(pair))
+    # results = AnalysisResults(elevation_columns= [{'start': 100.0, 'end': 200.0, 'name': 'elapsed'}])
+
+    print(info.analysis_results)
+
+    simple_log.set_level("WARNING")
+    tests = list(all_tests())
+
+    for index, test in enumerate(tests):
+        length = len(test.data)
+        print(f"{index=} {test.parameters_relative_path} {length=}")
+
+    # print(f"{results = }")
+
+    info = TestInfo.load("tests/2024-09-11/parameters.json")
+    print(f"{len(info.data) = }")
+    info.write_parameters()

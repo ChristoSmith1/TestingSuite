@@ -3,10 +3,45 @@
     "power_meter_data_relative_path": "raw_data\\MSU_PowerMeter_GoverT_2024_09_05T16_5399.csv",
     "px6_data_relative_path": "raw_data\\GTprocedure20240421.txt",
     "hwctrl_log_data_relative_path": "raw_data\\govert2.176.D249T16-57-00",
-    "combined_data_csv_relative_path": "analysis_data\\data.csv",
-    "parameters_relative_path": "tests\\2024-09-05-2\\parameters.json",
+    "combined_data_csv_relative_path": "analysis_data/data.csv",
+    "parameters_relative_path": "/home/dmayo/dev/playground/christo/tests/2024-09-05-2/parameters.json",
     "pointing_data_source": "hwctrl",
     "analysis_results": {
-        "elevation_columns": null
+        "elevation_columns": [
+            {
+                "start": 904.7772040367126,
+                "end": 3004.493303060532,
+                "name": "elapsed"
+            },
+            {
+                "start": 3090.694895029068,
+                "end": 5164.738307952881,
+                "name": "elapsed"
+            },
+            {
+                "start": 5250.5213351249695,
+                "end": 7325.3806681633,
+                "name": "elapsed"
+            },
+            {
+                "start": 7412.389332056045,
+                "end": 10086.139196157455,
+                "name": "elapsed"
+            }
+        ],
+        "on_off_moon_pairs": [
+            {
+                "on": {
+                    "start": 2202.3506650924683,
+                    "end": 2202.625118970871,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 2217.625118970871,
+                    "end": 2217.8995728492737,
+                    "name": "elapsed"
+                }
+            }
+        ]
     }
 }

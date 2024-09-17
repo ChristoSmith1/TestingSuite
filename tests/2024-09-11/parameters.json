@@ -1,0 +1,44 @@
+{
+    "description": "2024-09-11 test #1",
+    "power_meter_data_relative_path": "raw_data/MSU_PowerMeter_GoverT_2024_09_11T21_161.csv",
+    "px6_data_relative_path": "raw_data/GTprocedure20240911.1.txt",
+    "hwctrl_log_data_relative_path": "raw_data/GoverT1.176.D255T21-21-05",
+    "combined_data_csv_relative_path": "analysis_data/data.csv",
+    "parameters_relative_path": "/home/dmayo/dev/playground/christo/tests/2024-09-11/parameters.json",
+    "pointing_data_source": "hwctrl",
+    "analysis_results": {
+        "elevation_columns": [
+            {
+                "start": 999.8538179397584,
+                "end": 3229.9422969818115,
+                "name": "elapsed"
+            }
+        ],
+        "on_off_moon_pairs": [
+            {
+                "on": {
+                    "start": 281.7322578430176,
+                    "end": 281.7322578430176,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 296.7322578430176,
+                    "end": 296.7322578430176,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 775.8244750499725,
+                    "end": 775.8244750499725,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 790.8244750499725,
+                    "end": 790.8244750499725,
+                    "name": "elapsed"
+                }
+            }
+        ]
+    }
+}

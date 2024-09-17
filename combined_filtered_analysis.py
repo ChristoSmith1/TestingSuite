@@ -65,9 +65,9 @@ def find_clusters(
             ):
                 cluster.append(first_item)
             else:
-                print("found a cluster")
-                print(cluster[0])
-                print(cluster[-1])
+                # print("found a cluster")
+                # print(cluster[0])
+                # print(cluster[-1])
                 clusters.append(cluster)
                 cluster = []
                 cluster.append(first_item)
@@ -75,9 +75,9 @@ def find_clusters(
             pass
 
     if cluster:
-        print("found a cluster")
-        print(cluster[0])
-        print(cluster[-1])
+        # print("found a cluster")
+        # print(cluster[0])
+        # print(cluster[-1])
         clusters.append(cluster)
 
     return clusters

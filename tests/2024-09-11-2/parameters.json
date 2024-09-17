@@ -1,0 +1,107 @@
+{
+    "description": "2024-09-11 test #2",
+    "power_meter_data_relative_path": "raw_data/MSU_PowerMeter_GoverT_2024_09_11T22_172.csv",
+    "px6_data_relative_path": "raw_data/GTprocedure20240911.2.txt",
+    "hwctrl_log_data_relative_path": "raw_data/govert2.176.D255T22-17-00",
+    "combined_data_csv_relative_path": "analysis_data/data.csv",
+    "parameters_relative_path": "/home/dmayo/dev/playground/christo/tests/2024-09-11-2/parameters.json",
+    "pointing_data_source": "hwctrl",
+    "analysis_results": {
+        "elevation_columns": [
+            {
+                "start": 912.500846862793,
+                "end": 3011.6100418567657,
+                "name": "elapsed"
+            },
+            {
+                "start": 3097.207296848297,
+                "end": 5171.116669893265,
+                "name": "elapsed"
+            },
+            {
+                "start": 5256.0328578948975,
+                "end": 7331.627285957336,
+                "name": "elapsed"
+            },
+            {
+                "start": 7415.624367952347,
+                "end": 9497.751413822174,
+                "name": "elapsed"
+            }
+        ],
+        "on_off_moon_pairs": [
+            {
+                "on": {
+                    "start": 206.5156648159027,
+                    "end": 206.5156648159027,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 221.5156648159027,
+                    "end": 221.5156648159027,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 241.70368003845212,
+                    "end": 241.70368003845212,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 256.70368003845215,
+                    "end": 256.70368003845215,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 469.23086404800415,
+                    "end": 469.23086404800415,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 484.23086404800415,
+                    "end": 484.23086404800415,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 685.7308850288391,
+                    "end": 685.7308850288391,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 700.7308850288391,
+                    "end": 700.7308850288391,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 708.5777089595795,
+                    "end": 708.5777089595795,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 723.5777089595795,
+                    "end": 723.5777089595795,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 725.2691168785095,
+                    "end": 725.2691168785095,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 740.2691168785095,
+                    "end": 740.2691168785095,
+                    "name": "elapsed"
+                }
+            }
+        ]
+    }
+}

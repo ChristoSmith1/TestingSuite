@@ -4,7 +4,8 @@ Outputs_Not_Tracked_in_Git/
 /**/.vscode/
 /**/__pycache__/
 
-data/
+/tests/**/figures/
+/tests/**/analysis_data/
 
 # below copied from github:
 # Byte-compiled / optimized / DLL files

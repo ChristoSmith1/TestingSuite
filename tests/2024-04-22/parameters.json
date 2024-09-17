@@ -3,10 +3,54 @@
     "power_meter_data_relative_path": "raw_data\\MSU_PowerMeter_GoverT_04212024_0230UTC_1.csv",
     "px6_data_relative_path": "raw_data\\GTprocedure20240421.txt",
     "hwctrl_log_data_relative_path": "raw_data\\GTAUTO.176.D113T00-27-51",
-    "combined_data_csv_relative_path": "analysis_data\\data.csv",
-    "parameters_relative_path": "tests\\2024-03-26\\parameters.json",
+    "combined_data_csv_relative_path": "analysis_data/data.csv",
+    "parameters_relative_path": "/home/dmayo/dev/playground/christo/tests/2024-04-22/parameters.json",
     "pointing_data_source": "hwctrl",
     "analysis_results": {
-        "elevation_columns": null
+        "elevation_columns": [
+            {
+                "start": 1799.173036813736,
+                "end": 4059.4354169368735,
+                "name": "elapsed"
+            }
+        ],
+        "on_off_moon_pairs": [
+            {
+                "on": {
+                    "start": 1059.948683977127,
+                    "end": 1142.255287885666,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 1157.255287885666,
+                    "end": 1239.5618917942047,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 1322.5974369049072,
+                    "end": 1382.463469028473,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 1397.463469028473,
+                    "end": 1457.3295011520386,
+                    "name": "elapsed"
+                }
+            },
+            {
+                "on": {
+                    "start": 1562.7561399936676,
+                    "end": 1622.3711938858032,
+                    "name": "elapsed"
+                },
+                "off": {
+                    "start": 1637.3711938858032,
+                    "end": 1696.9862477779388,
+                    "name": "elapsed"
+                }
+            }
+        ]
     }
 }
