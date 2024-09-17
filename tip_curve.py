@@ -65,6 +65,15 @@ def tip_curve(info: TestInfo):
     t_el = t_op*10**((np.array(data["power"]) - info.average_off_moon())/10) 
     # This is why my math should have an "off moon measurement" at cold-sky with an additional attenuation of 25dB (approx 55.1 dB)
     plt.plot(elevation,t_el)
+    # smoothed = np.convolve(t_el, np.ones(1000) /1000, mode="valid")
+    # plt.plot(elevation[ : 14000], smoothed[ : 14000])
+    from scipy.ndimage import uniform_filter1d
+    N = 100
+    y = uniform_filter1d(t_el, size = N)
+    plt.ylabel("Temperature (K)")
+    plt.xlabel("Elevation")
+    plt.title("X-band Tip-Curve April Test")
+    plt.plot(elevation, y)
     print(t_op)
     plt.show()
 
