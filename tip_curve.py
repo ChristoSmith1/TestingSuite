@@ -46,10 +46,10 @@ fig, axes = plot_one(
 # x = np.array(data["elevation"])
 # axes.plot(x, y, color = "red")
 # save_figure(fig=fig, test_info=info, relative_path="elevationcolumntest.png")
-axes.set_xlabel("elapsed time")
-axes.set_ylabel("power (in dB)")
-axes.set_title("power over time for April X-band test")
-plt.show()
+# axes.set_xlabel("elapsed time")
+# axes.set_ylabel("power (in dB)")
+# axes.set_title("power over time for April X-band test")
+# plt.show()
 
 # yfactor = 5.2
 
@@ -60,7 +60,7 @@ def tip_curve(info: TestInfo):
     y_factor = info.y_factor()
     elevation = np.array(data["elevation"])
     print(f"{y_factor=}")
-    t_op = abs(180 - ((10 ** (y_factor / 10)) * 10)) / ((10 ** (y_factor / 10)) - 1)
+    t_op = abs(135 - ((10 ** (y_factor / 10)) * 10)) / ((10 ** (y_factor / 10)) - 1)
     # Top=abs((135-(10**(Yfactor/10))*10)/(10**(Yfactor/10)-1)) <- 135 moon contribution at S-Band, 180 at X-band
 
     # I need to get just the elevation column from sept_info which right now gets everything.
@@ -75,10 +75,10 @@ def tip_curve(info: TestInfo):
     y = uniform_filter1d(t_el, size = N)
     plt.ylabel("Temperature (K)")
     plt.xlabel("Elevation")
-    plt.title("X-band Tip-Curve April Test")
+    plt.title("S-band Tip-Curve March Test")
     plt.plot(elevation, y)
     print(t_op)
     plt.show()
 
 
-tip_curve(april_info)
+tip_curve(march_info)
