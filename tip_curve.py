@@ -29,13 +29,13 @@ import numpy as np
 # # fig,axes = plot_all_test_info(info,highlights=highlights,interval=info.analysis_results.elevation_column_interval())
 # # save_figure(fig=fig,test_info=info,relative_path="./christo.png")
 
-# fig, axes = plot_one(
-#     info.data,
-#     highlights=highlights,
-#     interval=info.analysis_results.elevation_columns[3],
-#     x_column_name="elevation",
-#     y_column_name="power",
-# )
+fig, axes = plot_one(
+    april_info.data,
+    # highlights=highlights,
+    # interval=info.analysis_results.elevation_columns[3],
+    x_column_name="elapsed",
+    y_column_name="power",
+)
 # axes.set_xlabel("christo")
 # axes.set_ylabel("mayo")
 # # x = np.array(
@@ -46,7 +46,10 @@ import numpy as np
 # x = np.array(data["elevation"])
 # axes.plot(x, y, color = "red")
 # save_figure(fig=fig, test_info=info, relative_path="elevationcolumntest.png")
-# plt.show()
+axes.set_xlabel("elapsed time")
+axes.set_ylabel("power (in dB)")
+axes.set_title("power over time for April X-band test")
+plt.show()
 
 # yfactor = 5.2
 

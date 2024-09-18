@@ -91,6 +91,7 @@ def plot_one(
         subplots_kwargs = {}
         subplots_kwargs["layout"] = "constrained"
         fig, [ax] = grid_subplots(1, **subplots_kwargs)
+    highlights = list(highlights or [])
 
     if interval:
         data = interval.subset_data_frame(data)
