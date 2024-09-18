@@ -25,5 +25,5 @@ def plot_power(info: TestInfo) -> None:
 
     plt.show()
 
-plot_power(sept_info)
+plot_power(april_info)
 
