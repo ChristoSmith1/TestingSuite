@@ -16,40 +16,40 @@ from util.plots import (
 import numpy as np
 
 
-# info = march_info
-# elevation_columns = info.analysis_results.elevation_columns
-# highlights = []
-# for elevation_column in elevation_columns:
-#     pass
-#     highlight = HighlightInterval(
-#         elevation_column, label="elevation column", color="#000fff", linewidth=4
-#     )
-#     highlights.append(highlight)
+info = march_info
+elevation_columns = info.analysis_results.elevation_columns
+highlights = []
+for elevation_column in elevation_columns:
+    pass
+    highlight = HighlightInterval(
+        elevation_column, label="elevation column", color="#000fff", linewidth=4
+    )
+    highlights.append(highlight)
 
-# # fig,axes = plot_all_test_info(info,highlights=highlights,interval=info.analysis_results.elevation_column_interval())
-# # save_figure(fig=fig,test_info=info,relative_path="./christo.png")
+# fig,axes = plot_all_test_info(info,highlights=highlights,interval=info.analysis_results.elevation_column_interval())
+# save_figure(fig=fig,test_info=info,relative_path="./christo.png")
 
-# fig, axes = plot_one(
-#     april_info.data,
-#     # highlights=highlights,
-#     # interval=info.analysis_results.elevation_columns[3],
-#     x_column_name="elapsed",
-#     y_column_name="power",
+fig, axes = plot_one(
+    april_info.data,
+    # highlights=highlights,
+    # interval=info.analysis_results.elevation_columns[3],
+    x_column_name="elapsed",
+    y_column_name="power",
+)
+axes.set_xlabel("christo")
+axes.set_ylabel("mayo")
+# x = np.array(
+#     info.analysis_results.elevation_columns[3].subset_data_frame(info.data)["power"]
 # )
-# axes.set_xlabel("christo")
-# axes.set_ylabel("mayo")
-# # x = np.array(
-# #     info.analysis_results.elevation_columns[3].subset_data_frame(info.data)["power"]
-# # )
-# data = info.elevation_column_data_list[2]
-# y = np.array(data["power"])
-# x = np.array(data["elevation"])
-# axes.plot(x, y, color = "red")
-# save_figure(fig=fig, test_info=info, relative_path="elevationcolumntest.png")
-# axes.set_xlabel("elapsed time")
-# axes.set_ylabel("power (in dB)")
-# axes.set_title("power over time for April X-band test")
-# plt.show()
+data = info.elevation_column_data_list[0]
+y = np.array(data["power"])
+x = np.array(data["elevation"])
+axes.plot(x, y, color = "red")
+save_figure(fig=fig, test_info=info, relative_path="elevationcolumntest.png")
+axes.set_xlabel("elapsed time")
+axes.set_ylabel("power (in dB)")
+axes.set_title("power over time for April X-band test")
+plt.show()
 
 # import YFactor and use info to generate average Y-factor from multiple on/off measurements
 def tip_curve(info: TestInfo):
