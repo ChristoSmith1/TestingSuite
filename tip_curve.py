@@ -14,45 +14,11 @@ from util.plots import (
     plot_all,
 )
 import numpy as np
+import numpy.typing as npt
 
 
-info = march_info
-elevation_columns = info.analysis_results.elevation_columns
-highlights = []
-for elevation_column in elevation_columns:
-    pass
-    highlight = HighlightInterval(
-        elevation_column, label="elevation column", color="#000fff", linewidth=4
-    )
-    highlights.append(highlight)
 
-# fig,axes = plot_all_test_info(info,highlights=highlights,interval=info.analysis_results.elevation_column_interval())
-# save_figure(fig=fig,test_info=info,relative_path="./christo.png")
-
-fig, axes = plot_one(
-    april_info.data,
-    # highlights=highlights,
-    # interval=info.analysis_results.elevation_columns[3],
-    x_column_name="elapsed",
-    y_column_name="power",
-)
-axes.set_xlabel("christo")
-axes.set_ylabel("mayo")
-# x = np.array(
-#     info.analysis_results.elevation_columns[3].subset_data_frame(info.data)["power"]
-# )
-data = info.elevation_column_data_list[0]
-y = np.array(data["power"])
-x = np.array(data["elevation"])
-axes.plot(x, y, color = "red")
-save_figure(fig=fig, test_info=info, relative_path="elevationcolumntest.png")
-axes.set_xlabel("elapsed time")
-axes.set_ylabel("power (in dB)")
-axes.set_title("power over time for April X-band test")
-plt.show()
-
-# import YFactor and use info to generate average Y-factor from multiple on/off measurements
-def tip_curve(info: TestInfo):
+def tip_curve(info: TestInfo)-> tuple[npt.NDArray[float], npt.NDArray[float]]: # type: ignore
     data = info.elevation_column_data_list[0]
     data = data.sort_values("elevation")
     y_factor = info.y_factor()
@@ -72,10 +38,46 @@ def tip_curve(info: TestInfo):
     y = uniform_filter1d(t_el, size = N)
     plt.ylabel("Temperature (K)")
     plt.xlabel("Elevation")
-    plt.title("X-BandTip-Curve Sept 05 2024 Test")
+    plt.title(info.description)
     plt.plot(elevation, y)
     print(t_op)
     plt.show()
+    return elevation, t_el
 
+if __name__ == "__main__":
+    info = march_info
+    elevation_columns = info.analysis_results.elevation_columns
+    highlights = []
+    for elevation_column in elevation_columns:
+        pass
+        highlight = HighlightInterval(
+            elevation_column, label="elevation column", color="#000fff", linewidth=4
+        )
+        highlights.append(highlight)
 
-tip_curve(sept_info)
+    # fig,axes = plot_all_test_info(info,highlights=highlights,interval=info.analysis_results.elevation_column_interval())
+    # save_figure(fig=fig,test_info=info,relative_path="./christo.png")
+
+    fig, axes = plot_one(
+        info.data,
+        # highlights=highlights,
+        # interval=info.analysis_results.elevation_columns[3],
+        x_column_name="elapsed",
+        y_column_name="power",
+    )
+    # x = np.array(
+    #     info.analysis_results.elevation_columns[3].subset_data_frame(info.data)["power"]
+    # )
+    data = info.elevation_column_data_list[0]
+    y = np.array(data["power"])
+    x = np.array(data["elapsed"])
+    axes.plot(x, y, color = "red")
+    # save_figure(fig=fig, test_info=info, relative_path="elevationcolumntest.png")
+    # axes.set_xlabel("elapsed time")
+    # axes.set_ylabel("power (in dB)")
+    # axes.set_title("power over time for April X-band test")
+    plt.show()
+    # exit()
+
+    # import YFactor and use info to generate average Y-factor from multiple on/off measurements
+    tip_curve(sept_info)

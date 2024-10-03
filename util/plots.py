@@ -265,32 +265,52 @@ def save_figure(
 
 if __name__ == "__main__":
     simple_log.set_level("DEBUG")
-    from test_info import march_info, april_info, sept_info, sept_info2
-    test_info = sept_info2
+    from test_info import march_info, april_info, sept_info, sept_info2, TestInfo
+    test_info = march_info
+    test_info = TestInfo.load("tests/2024-09-11/parameters.json")
+    highlights = [
+        HighlightInterval(
+            interval=on,
+            label=f"ON_{index} {on.start:.3f},{on.end:.3f}"
+        )
+        for (index, (on, off))
+        in enumerate(test_info.analysis_results.on_off_moon_pairs)
+    ]
+    highlights.extend(
+        [
+            HighlightInterval(
+                interval=off,
+                label=f"OFF_{index} {off.start:.3f},{off.end:.3f}"
+            )
+            for (index, (on, off))
+            in enumerate(test_info.analysis_results.on_off_moon_pairs)
+        ]
+    )
     fig, axes = plot_all_test_info(
         test_info=test_info,
-        highlights=[
-            HighlightInterval(
-                ColumnInclusiveInterval(start=939, end=2945),
-                color="#0000ff",
-                label="EL_COL_0",
-            ),
-            HighlightInterval(
-                ColumnInclusiveInterval(start=3120, end=5105),
-                color="#00ff00",
-                label="EL_COL_1",
-            ),
-            HighlightInterval(
-                ColumnInclusiveInterval(start=5270, end=7260),
-                color="#ff0000",
-                label="EL_COL_2",
-            ),
-            HighlightInterval(
-                ColumnInclusiveInterval(start=7420, end=9420),
-                color="#cccc00",
-                label="EL_COL_4",
-            ),
-        ],
+        highlights=highlights,
+        # highlights=[
+        #     HighlightInterval(
+        #         ColumnInclusiveInterval(start=939, end=2945),
+        #         color="#0000ff",
+        #         label="EL_COL_0",
+        #     ),
+        #     HighlightInterval(
+        #         ColumnInclusiveInterval(start=3120, end=5105),
+        #         color="#00ff00",
+        #         label="EL_COL_1",
+        #     ),
+        #     HighlightInterval(
+        #         ColumnInclusiveInterval(start=5270, end=7260),
+        #         color="#ff0000",
+        #         label="EL_COL_2",
+        #     ),
+        #     HighlightInterval(
+        #         ColumnInclusiveInterval(start=7420, end=9420),
+        #         color="#cccc00",
+        #         label="EL_COL_4",
+        #     ),
+        # ],
     )
 
     save_figure(
