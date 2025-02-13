@@ -14,7 +14,8 @@ def choose_device():
         resource_id = "todo"
         try:
             listed_device = test.open_resource(resource)
-            query_response: str = listed_device.query("CF?")
+            query_response: str = listed_device.query("*IDN?")
+            # query_response: str = listed_device.query("CF?")
             resource_id = query_response.strip()
             # print (f"{query_response = } ")
         except Exception as exc:
