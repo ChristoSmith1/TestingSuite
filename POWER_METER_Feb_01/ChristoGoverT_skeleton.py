@@ -13,7 +13,7 @@ rm = pyvisa.ResourceManager() #This lookes at all of the GPIB available resource
 
 print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
 
-power_meter = rm.open_resource('GPIB1::13::INSTR') #connects to the insturment of our choosing, hardcoded in at the moment.
+power_meter = rm.open_resource('GPIB2::13::INSTR') #connects to the insturment of ou1r choosing, hardcoded in at the moment.
 #print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB address, serial number and firmware version and works.
 
 #print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
@@ -40,7 +40,7 @@ filenumber = input("Input file number (1,2,etc.): ")
 #opens a titles a CSV, should be in format Power_Reading_DISHNAME_Date.csv
 
 # Create new file
-file_name = "MSU_PowerMeter_GoverT_02202024_1500UTC_" + filenumber + ".csv"
+file_name = "SBanDPowerMeter_GoverT_02122025_2300UTC_" + filenumber + ".csv"
 with open(file_name, "w", encoding="utf8") as file:
     file.write("")
 
