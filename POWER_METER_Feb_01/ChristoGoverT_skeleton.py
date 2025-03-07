@@ -9,26 +9,39 @@ import numpy as np
 ####### STARTS THE CLOCK ON OPERATION AND CONFIRMS ADDRESS IN EVENT OF MULTIPLE MACHINES #########3
 
 start_time = time.monotonic() #start time of operations of the actual machine, and reading of data
-rm = pyvisa.ResourceManager() #This lookes at all of the GPIB available resources and gives their addresses in a particular format
+test = pyvisa.ResourceManager()
+def choose_device():
+    resources = list(test.list_resources())
+    for index, resource in enumerate(resources):
+        resource_id = "todo"
+        try:
+            listed_device = test.open_resource(resource)
+            query_response: str = listed_device.query("IDN?")
+            resource_id = query_response.strip()
+            # print (f"{query_response = } ")
+        except Exception as exc:
+            resource_id = "not available"
+        print(f"[{index}] {resource} {resource_id}")
 
-print(rm.list_resources()) #I want to make it so it lets me CHOOSE which resource I want to use, so that power meter is based on my input "choose insturment [1]etc."
+    user_input = input("select a number for your device: ")
+    user_input_int = int(user_input)
+    chosen_device_name = resources[user_input_int]
+    chosen_device = test.open_resource(chosen_device_name)
+    return chosen_device
 
-power_meter = rm.open_resource('GPIB1::13::INSTR') #connects to the insturment of our choosing, hardcoded in at the moment.
-#print(power_meter.query('*IDN?')) #this asks the insturment to print its GPIB address, serial number and firmware version and works.
-
-#print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
+print(power_meter.query('SYST:RINT?')) #this is to make sure you are using the correct address interface
 
 ########TESTING AND CALIBRATION THAT CAN BE AUTOMATED ########
-#print(power_meter.write('CAL')) #this calibrates the insturment
-#sleep(20)
-#print(power_meter.write('ZE')) #this zeroe's the insturment
-#sleep(20)
-#power_meter.write('*TST?') # This makes the machine conduct a self test before beginning
-#sleep(20)
+print(power_meter.write('CAL')) #this calibrates the insturment
+sleep(20)
+print(power_meter.write('ZE')) #this zeroe's the insturment
+sleep(20)
+power_meter.write('*TST?') # This makes the machine conduct a self test before beginning
+sleep(20)
 #the sleep cycles in the machine cal process above are their because while they are running, if I attempt to read out power it will crash
-#print(power_meter.query('*OPC?')) #this is the SCIP protocol for telling me operations are completed, currently prints "+5" implying syntax error
-#sleep(5)
-#input("Press Enter to continue...")
+print(power_meter.query('*OPC?')) #this is the SCIP protocol for telling me operations are completed, currently prints "+5" implying syntax error
+sleep(5)
+input("Press Enter to continue...")
 
 number_of_readings = 1000000 #This is the hard coded value for the first test we did on May 2, 2023
 pause_between_readings = 0.10 #This is the hard coded value for the first test we did on May 2, 2023
