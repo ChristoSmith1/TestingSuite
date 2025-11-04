@@ -19,12 +19,12 @@ from combined_filtered_analysis import y_factor_criteria
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 parsed DTT logs\dcc.car.2025-297.csv"
+POWER_METER_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 100-304 parsed DTT logs\dcc.car.2025-288.csv"
 # PX6_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\TAUR_A_TRACK_DOY297\TAUA.txt"
-HWCTRL_LOG_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 HWCTRL LOGS\TAUR.176.D297T02-02-05"
+HWCTRL_LOG_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 HWCTRL LOGS\CAPS.176.D288T16-37-00"
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\combineddata.csv"
-FILTERED_COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\filtered_combined_data.csv"
+COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\combined288.csv"
+FILTERED_COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\filtered_combined288.csv"
 
 
 # # INPUT DATA PATHS
