@@ -105,7 +105,14 @@ def read_power_file(path: str) -> list [dict[str, datetime | float]]:
         csv_reader = csv.DictReader(csv_file,fieldnames=["timestamp","power"])
         for row_dict in csv_reader:
             timestamp_str = row_dict["timestamp"]
-            timestamp_dt = datetime.fromisoformat(timestamp_str)
+
+            # HACK: Power meter CSV has no headers, DTT-parsed data has headers
+            # So if we fail here, treat as header line and skip
+            try:
+                timestamp_dt = datetime.fromisoformat(timestamp_str)
+            except ValueError:
+                continue
+            
             timestamp_dt = timestamp_dt.replace(tzinfo=timezone.utc)
             power_float = float(row_dict["power"])
             row_dict["power"] = power_float

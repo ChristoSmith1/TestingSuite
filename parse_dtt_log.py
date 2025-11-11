@@ -63,10 +63,10 @@ def read_dtt_log(path: Path):
     # print(edited_dtt_frame)
 
     # Rename column
-    data['Pc/N0'] = data['Estimate of Pc/No      dB-Hz']
+    data['power'] = data['Estimate of Pc/No      dB-Hz']
     
     # Subset data to columns we care about
-    data=data[['timestamp','Pc/N0']]
+    data=data[['timestamp','power']]
 
     # Return
     return data
@@ -89,8 +89,10 @@ if __name__ == "__main__":
             output_path.parent.mkdir(parents=True, exist_ok=True,)
             data.to_csv(output_path, index=False)
             print(f"Wrote output to {output_path}")
-        except Exception:
+        except Exception as exc:
             print(f"FAILED on {path}")
+            import traceback
+            traceback.print_exc()
             failures.append(path)
 
     print(f"Failed on {len(failures)} paths:")

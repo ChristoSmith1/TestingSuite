@@ -19,12 +19,12 @@ from combined_filtered_analysis import y_factor_criteria
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 100-304 parsed DTT logs\dcc.car.2025-288.csv"
+POWER_METER_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 parsed DTT logs\dcc.car.2025-289.csv"
 # PX6_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\TAUR_A_TRACK_DOY297\TAUA.txt"
-HWCTRL_LOG_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 HWCTRL LOGS\CAPS.176.D288T16-37-00"
+HWCTRL_LOG_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 HWCTRL LOGS\MVN.176.D289T21-16-09"
 # OUTPUT DATA PATHS
-COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\combined288.csv"
-FILTERED_COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\filtered_combined288.csv"
+COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\combined289.csv"
+FILTERED_COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\filtered_combined289.csv"
 
 
 # # INPUT DATA PATHS
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # Read the data
     print(f"***** Reading in data *****")
     power_meter_data = g_over_t.read_power_file(POWER_METER_DATA_PATH)
-    px6_data = g_over_t.read_px6_file(PX6_DATA_PATH)
+    # px6_data = g_over_t.read_px6_file(PX6_DATA_PATH)
     hwctrl_data = g_over_t.parse_hwctrl_log_file(HWCTRL_LOG_DATA_PATH)
 
 
@@ -88,8 +88,8 @@ if __name__ == "__main__":
     print(f"`power_meter_data`  from {POWER_METER_DATA_PATH}")
     print_raw_data_info(power_meter_data)
     print()
-    print(f"`px6_data`  from {PX6_DATA_PATH}")
-    print_raw_data_info(px6_data)
+    # print(f"`px6_data`  from {PX6_DATA_PATH}")
+    # print_raw_data_info(px6_data)
     print()
     print(f"`hwctrl_data`  from {HWCTRL_LOG_DATA_PATH}")
     print_raw_data_info(hwctrl_data)
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     print("`hwctrl_data`:      ", end="")
     print_timezone(hwctrl_data)
     print("`px6_data`:         ", end="")
-    print_timezone(px6_data)
+    # print_timezone(px6_data)
     print("`power_meter_data`: ", end="")
     print_timezone(power_meter_data)
     print()
