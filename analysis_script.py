@@ -19,9 +19,9 @@ from combined_filtered_analysis import y_factor_criteria
 
 # INPUT DATA PATHS
 # Paths to data from 2024-04-21 test
-POWER_METER_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 parsed DTT logs\dcc.car.2025-289.csv"
+POWER_METER_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\dcc.car.2025-289_edited_copy.csv"
 # PX6_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\TAUR_A_TRACK_DOY297\TAUA.txt"
-HWCTRL_LOG_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\DOY 288-304 HWCTRL LOGS\MVN.176.D289T21-16-09"
+HWCTRL_LOG_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\CAPS.176.D289T17-55-07"
 # OUTPUT DATA PATHS
 COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\combined289.csv"
 FILTERED_COMBINED_DATA_PATH = R"C:\Users\chris\OneDrive\Desktop\ANOMALY TRACK DATA OCTOBER 2025\Parsed_PcN0_with_pointing\filtered_combined289.csv"
